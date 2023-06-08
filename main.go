@@ -5,19 +5,26 @@ import (
 	_ "embed"
 	"fmt"
 	"image"
+	"image/color"
 	_ "image/png"
 	"log"
+	"time"
+
+	"golang.org/x/image/font"
+	"golang.org/x/image/font/opentype"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/audio"
+	"github.com/hajimehoshi/ebiten/v2/audio/mp3"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
+	"github.com/hajimehoshi/ebiten/v2/examples/resources/fonts"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
+	"github.com/hajimehoshi/ebiten/v2/text"
 )
 
 // 256, 320 # 8x10 32 pixel tiles
 // 200, 320 # qvga 6,25x10 32 pixel tiles
 // 320, 480 # hvga 10x15 32 pixel tiles
-// 480, 800 # wvga800 15x25 32 pixel tiles
-// 240, 400 # hwvga800 7.5x12.5 32 pixel tiles
 // 256, 384 # SEUCK Amiga 8x12 32 pixel tiles
 // Xevious      288x224@60 7x9
 // Terra cresta 256x224@60 7x8
@@ -25,35 +32,99 @@ import (
 // 1942         256x224@59 7x8
 // Alcon        296x240@57 7,5x
 const (
-	screenWidth  = 256
-	screenHeight = 256
-	tileSize     = 32
-	zoom         = 3
+	screenWidth     = 256
+	screenHeight    = 396
+	tilesWidth      = 8
+	tilesHeight     = 12
+	tileSize        = 32
+	zoom            = 2
+	playerSpeed     = 2
+	playerAnimSpeed = 4
+	playerFrameNum  = 5
+	playerFrameSize = 24
 )
 
 var (
+
+	//go:embed assets/PublicPixel-z84yD.ttf
+	arcadeFont_ttf []byte
+	arcadeFont     font.Face
+
+	audioContext *audio.Context
+	//go:embed assets/moon_patrol.mp3
+	audioTheme_mp3 []byte
+
 	tilesImage *ebiten.Image
 	//go:embed assets/map/Tiles.png
 	Tiles_png []byte
+	// position  = 0
+
+	SuperFlyingManImage *ebiten.Image
+	//go:embed assets/sprites/SuperFlyingMan.png
+	SuperFlyingMan_png []byte
+
+	lastUpdate time.Time
 )
 
+type Game struct {
+	gameMap       []int
+	position      int
+	PlayerX       float64
+	PlayerY       float64
+	PlayerFrame   int
+	PlayerCounter int
+	PlayerDir     int
+}
+
 func init() {
-	// Decode an image from the image file's byte slice.
+
+	tt, err := opentype.Parse(fonts.PressStart2P_ttf)
+	if err != nil {
+		log.Fatal(err)
+	}
+	const dpi = 25
+	arcadeFont, err = opentype.NewFace(tt, &opentype.FaceOptions{
+		Size:    24,
+		DPI:     dpi,
+		Hinting: font.HintingFull,
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Load and play game theme
+	audioContext = audio.NewContext(44100)
+	s, err := mp3.DecodeWithoutResampling(bytes.NewReader(audioTheme_mp3))
+	if err != nil {
+		log.Fatal(err)
+	}
+	ss := audio.NewInfiniteLoop(s, s.Length())
+	player, err := audio.NewPlayer(audioContext, ss)
+	if err != nil {
+		log.Fatal(err)
+	}
+	player.Play()
+
+	// Decode map tiles from the image file's byte slice.
 	img, _, err := image.Decode(bytes.NewReader(Tiles_png))
-	// img, _, err := ebitenutil.NewImageFromFile("assets/MapTiles.png")
 	if err != nil {
 		log.Fatal(err)
 	}
 	tilesImage = ebiten.NewImageFromImage(img)
-}
 
-type Game struct {
-	gameMap []int
+	// Decode player one spritesheet from the image file's byte slice.
+	img, _, err = image.Decode(bytes.NewReader(SuperFlyingMan_png))
+	if err != nil {
+		log.Fatal(err)
+	}
+	SuperFlyingManImage = ebiten.NewImageFromImage(img)
 }
 
 func (g *Game) Update() error {
 
-	inpututil.IsKeyJustPressed(ebiten.KeyArrowUp)
+	if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
+		panic("Bye")
+	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyF) {
 		if ebiten.IsFullscreen() {
 			ebiten.SetFullscreen(false)
@@ -61,30 +132,88 @@ func (g *Game) Update() error {
 			ebiten.SetFullscreen(true)
 		}
 	}
+
+	if ebiten.IsKeyPressed(ebiten.KeyArrowUp) {
+		g.PlayerY -= playerSpeed
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyArrowDown) {
+		g.PlayerY += playerSpeed
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyArrowLeft) {
+		g.PlayerX -= playerSpeed
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyArrowRight) {
+		g.PlayerX += playerSpeed
+	}
+
+	if g.PlayerX < 0 {
+		g.PlayerX = 0
+	} else if g.PlayerX > screenWidth-playerFrameSize {
+		g.PlayerX = screenWidth - playerFrameSize
+	}
+
+	if g.PlayerY < 0 {
+		g.PlayerY = 0
+	} else if g.PlayerY > screenHeight-playerFrameSize {
+		g.PlayerY = screenHeight - playerFrameSize
+	}
+
+	// compute Player one frame ping pong animation
+	g.PlayerCounter++
+	if g.PlayerCounter >= playerAnimSpeed {
+		g.PlayerFrame += g.PlayerDir
+		if g.PlayerFrame >= playerFrameNum-1 || g.PlayerFrame <= 0 {
+			g.PlayerDir *= -1 // Reverse direction
+		}
+		g.PlayerCounter = 0
+	}
+
+	if time.Since(lastUpdate) > 800*time.Millisecond {
+		lastUpdate = time.Now()
+		g.position += 8
+		if g.position >= len(gameMap)-8*8 {
+			g.position = 0
+		}
+	}
+
 	return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	w := tilesImage.Bounds().Dx()
-	tileXCount := w / tileSize
 
-	// Draw each tile with each DrawImage call.
-	// As the source images of all DrawImage calls are always same,
-	// this rendering is done very efficiently.
-	// For more detail, see https://pkg.go.dev/github.com/hajimehoshi/ebiten/v2#Image.DrawImage
-	const xCount = screenWidth / tileSize
+	tileIndex := 0
 
-	for i, t := range g.gameMap {
-		op := &ebiten.DrawImageOptions{}
-		op.GeoM.Translate(float64((i%xCount)*tileSize), float64((i/xCount)*tileSize))
+	// Draw world window
+	rowPosition := g.position
+	fmt.Println("------------------")
+	for rowIndex := tilesHeight - 1; rowIndex >= 0; rowIndex-- {
+		fmt.Println("Pos: ", g.position, "Row", rowIndex, "-")
+		for columnIndex := 0; columnIndex < tilesWidth; columnIndex++ {
+			fmt.Print("col:", columnIndex, " ")
 
-		sx := (t % tileXCount) * tileSize
-		sy := (t / tileXCount) * tileSize
-
-		screen.DrawImage(tilesImage.SubImage(image.Rect(sx, sy, sx+tileSize, sy+tileSize)).(*ebiten.Image), op)
+			op := &ebiten.DrawImageOptions{}
+			op.GeoM.Translate(float64(tileSize*columnIndex), float64(tileSize*rowIndex))
+			tileIndex = gameMap[rowPosition]
+			rowPosition++
+			fmt.Print("til:", tileIndex, ", ")
+			screen.DrawImage(getTile(tileIndex).(*ebiten.Image), op)
+		}
+		fmt.Println()
 	}
 
-	ebitenutil.DebugPrint(screen, fmt.Sprintf("TPS: %0.2f", ebiten.ActualTPS()))
+	// Draw Player one
+	playerFrameX := g.PlayerFrame * playerFrameSize
+	opts := &ebiten.DrawImageOptions{}
+	opts.GeoM.Translate(g.PlayerX, g.PlayerY)
+	screen.DrawImage(SuperFlyingManImage.SubImage(image.Rect(playerFrameX, 0, playerFrameX+playerFrameSize, playerFrameSize)).(*ebiten.Image), opts)
+
+	// Draw debug data
+	ebitenutil.DebugPrint(screen, fmt.Sprintf("TPS: %0.2f FPS: %0.2f", ebiten.ActualTPS(), ebiten.ActualFPS()))
+
+	// Draw info
+	msg := fmt.Sprintf("1UP %v", g.position)
+	text.Draw(screen, msg, arcadeFont, 170, 15, color.White)
+
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
@@ -94,32 +223,15 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 func main() {
 
 	g := &Game{
-
-		gameMap: []int{
-			0, 1, 1, 0, 1, 1, 1, 0,
-			0, 1, 0, 1, 0, 1, 1, 1,
-			0, 0, 1, 1, 0, 1, 0, 15,
-			2, 3, 4, 5, 6, 7, 10, 11,
-			18, 17, 83, 62, 63, 8, 9, 14,
-			17, 16, 62, 60, 61, 16, 12, 13,
-			18, 60, 16, 17, 16, 83, 16, 17,
-			83, 18, 17, 16, 18, 64, 83, 59,
-		},
+		PlayerX:   (screenWidth - playerFrameSize) / 2,
+		PlayerY:   screenHeight - playerFrameSize,
+		PlayerDir: 1, // Start with forward direction
 	}
-	reverse(g.gameMap)
 
 	ebiten.SetWindowSize(screenWidth*zoom, screenHeight*zoom)
-	ebiten.SetWindowTitle("Super flying man and pig")
+	ebiten.SetWindowTitle("Super flying man and Pig")
 	// ebiten.SetWindowIcon([]image.Image{loadImage("assets/icon.png")})
 	if err := ebiten.RunGame(g); err != nil {
 		log.Fatal(err)
 	}
-}
-
-func reverse(numbers []int) []int {
-	for i := 0; i < len(numbers)/2; i++ {
-		j := len(numbers) - i - 1
-		numbers[i], numbers[j] = numbers[j], numbers[i]
-	}
-	return numbers
 }
