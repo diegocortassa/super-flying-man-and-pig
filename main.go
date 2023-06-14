@@ -41,6 +41,7 @@ const (
 	tilesScreenHeight = 12
 	tileSize          = 32
 	zoom              = 2
+	spriteSize        = 24
 	scrollSpeed       = 30 // speed in 1 pixel per microsecond
 )
 
@@ -55,8 +56,18 @@ const (
 )
 
 var (
+	debug bool
+
 	fullscreen bool
 	flagCRT    bool
+
+	SpriteSheetImage *ebiten.Image
+	//go:embed assets/SpriteSheet.png
+	SpriteSheet_png []byte
+
+	tilesImage *ebiten.Image
+	//go:embed assets/Tiles.png
+	Tiles_png []byte
 
 	// EMBEDDED data
 	//go:embed assets/ARCADEPI.TTF
@@ -71,11 +82,6 @@ var (
 	audioContext *audio.Context
 	//go:embed assets/2_Stage_lo_hi.mp3
 	audioTheme_mp3 []byte
-
-	tilesImage *ebiten.Image
-	//go:embed assets/map/Tiles.png
-	Tiles_png []byte
-	// position  = 0
 
 	iconImage *ebiten.Image
 	//go:embed "assets/Icon.png"
@@ -96,9 +102,11 @@ type Game struct {
 	touchIDs   []ebiten.TouchID
 	gamepadIDs []ebiten.GamepadID
 
-	playerOne            PlayerOne
-	playerOneBullettPool []*PlayerOneBullet
-	enemies              []*EnemyFlyingMan1
+	players              []*Entity
+	playerOneBullettPool []*Entity
+	playerTwoBullettPool []*Entity
+	enemies              []*Entity
+	enemiesBullettPool   []*Entity
 }
 
 func init() {
@@ -130,7 +138,7 @@ func init() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	audioThemePlayer.SetVolume(0.2)
+	audioThemePlayer.SetVolume(0.02)
 	audioThemePlayer.Play()
 
 	// Decode map tiles from the image file's byte slice.
@@ -143,23 +151,117 @@ func init() {
 
 func (g *Game) init() {
 
-	g.playerOne = newPlayer()
-	initPlayerOneBullettPool(g)
+	// Decode sprite sheet from the image file's byte slice.
+	img, _, err := image.Decode(bytes.NewReader(SpriteSheet_png))
+	if err != nil {
+		log.Fatal(err)
+	}
+	SpriteSheetImage = ebiten.NewImageFromImage(img)
 
-	ne0 := newEnemyFlyingMan1(30, 0)
-	g.enemies = append(g.enemies, &ne0)
-	ne1 := newEnemyFlyingMan1(150, 0)
-	g.enemies = append(g.enemies, &ne1)
-	ne2 := newEnemyFlyingMan1(180, 0)
-	g.enemies = append(g.enemies, &ne2)
-	ne3 := newEnemyFlyingMan1(200, 0)
-	g.enemies = append(g.enemies, &ne3)
+	// #region player one
+	playerOne := newEntity(
+		SpriteSheetImage,
+		animSuperFlyingMan,
+		Vector{x: (screenWidth - spriteSize) / 4, y: screenHeight - spriteSize - 20},
+	)
+
+	mover := NewKeyboardMover(
+		playerOne,
+		Keybinds{
+			Up:        ebiten.KeyArrowUp,
+			Down:      ebiten.KeyArrowDown,
+			Left:      ebiten.KeyArrowLeft,
+			Right:     ebiten.KeyArrowRight,
+			Fire:      ebiten.KeyControlLeft,
+			Secondary: ebiten.KeyAltLeft,
+		},
+		Vector{1, 1},
+	)
+	playerOne.addComponent(mover)
+	g.playerOneBullettPool = initBulletPool(animSuperFlyingManPew)
+	log.Println("main", len(g.playerOneBullettPool))
+	shooter := NewKeyboardShooter(
+		playerOne,
+		ebiten.KeyControlLeft,
+		g.playerOneBullettPool,
+		time.Millisecond*250,
+	)
+	playerOne.addComponent(shooter)
+
+	g.players = append(g.players, playerOne)
+	// #endregion player one
+
+	// #region player two
+	playerTwo := newEntity(
+		SpriteSheetImage,
+		animPig,
+		Vector{x: (screenWidth - spriteSize) / 4 * 3, y: screenHeight - spriteSize - 20},
+	)
+	mover = NewKeyboardMover(
+		playerTwo,
+		Keybinds{
+			Up:        ebiten.KeyW,
+			Down:      ebiten.KeyS,
+			Left:      ebiten.KeyA,
+			Right:     ebiten.KeyD,
+			Fire:      ebiten.KeyQ,
+			Secondary: ebiten.KeyAltLeft,
+		},
+		Vector{1, 1},
+	)
+	playerTwo.addComponent(mover)
+
+	g.playerTwoBullettPool = initBulletPool(animPigPew)
+	shooter = NewKeyboardShooter(
+		playerTwo,
+		ebiten.KeyQ,
+		g.playerTwoBullettPool,
+		time.Millisecond*250,
+	)
+	playerTwo.addComponent(shooter)
+
+	g.players = append(g.players, playerTwo)
+	// #endregion player two
+
+	// Enemies
+	var enemy *Entity
+	g.enemiesBullettPool = initBulletPool(animEnemyPew)
+
+	enemy = newEntity(
+		SpriteSheetImage,
+		animEnemyThing,
+		Vector{x: 30, y: 0},
+	)
+	cmover := NewConstantMover(enemy, Vector{x: 0.2, y: 1})
+	enemy.addComponent(cmover)
+	g.enemies = append(g.enemies, enemy)
+
+	enemy = newEntity(
+		SpriteSheetImage,
+		animEnemyFlyingMan1,
+		Vector{x: 0, y: 0},
+	)
+	cmover = NewConstantMover(enemy, Vector{x: 0.3, y: 0.3})
+	enemy.addComponent(cmover)
+	cshooter := NewConstantShooter(
+		enemy,
+		time.Millisecond*250,
+		g.enemiesBullettPool,
+	)
+	enemy.addComponent(cshooter)
+	g.enemies = append(g.enemies, enemy)
+
+	// ne1 := newEnemyFlyingMan1(150, 0)
+	// g.enemies = append(g.enemies, &ne1)
+	// ne2 := newEnemyFlyingMan1(180, 0)
+	// g.enemies = append(g.enemies, &ne2)
+	// ne3 := newEnemyFlyingMan1(200, 0)
+	// g.enemies = append(g.enemies, &ne3)
 }
 
 func (g *Game) reset() {
 	g.position = 0
 	g.enemies = nil
-	g.playerOneBullettPool = nil
 	g.init()
 }
 
@@ -180,14 +282,33 @@ func (g *Game) Update() error {
 		g.reset()
 	}
 
-	g.playerOne.Update(g)
+	for _, player := range g.players {
+		player.Update(g)
+	}
+
 	for _, playerOneBullet := range g.playerOneBullettPool {
 		playerOneBullet.Update(g)
 	}
 
-	for _, enemy := range g.enemies {
-		enemy.Update(g)
+	for _, playerTwoBullet := range g.playerTwoBullettPool {
+		playerTwoBullet.Update(g)
 	}
+
+	for _, entity := range g.enemies {
+		entity.Update(g)
+	}
+
+	for _, enemyBullet := range g.enemiesBullettPool {
+		enemyBullet.Update(g)
+	}
+
+	// p1 := g.entities[0]
+	// p2 := g.entities[1]
+	// if g.isCollision(p2.position.x, p2.position.y, spriteSize, spriteSize, p1.position.x, p1.position.y, spriteSize, spriteSize) {
+	// 	log.Println("Game Over")
+	// 	// ebiten.SetRunnableOnUnfocused(true)
+	// 	// return nil
+	// }
 
 	if time.Since(lastUpdate) > scrollSpeed*time.Millisecond {
 		lastUpdate = time.Now()
@@ -208,11 +329,12 @@ func (g *Game) Update() error {
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
+	activeBuls := 0
+	activeEntities := 0
 	tileIndex := 0
 	// Draw world window
 	rowPosition := (g.position / tileSize) * tilesScreenWidth
 	screenPosition := (g.position % tileSize)
-	// fmt.Println("------------------")
 	// for rowIndex := tilesScreenHeight - 1; rowIndex >= 0; rowIndex-- { // use this to show scrolling trick
 	for rowIndex := tilesScreenHeight; rowIndex >= 0; rowIndex-- {
 		// fmt.Println("WPos: ", g.position, "SPos:", screenPosition, "RPos:", rowPosition, "Row:", rowIndex, "-")
@@ -224,23 +346,43 @@ func (g *Game) Draw(screen *ebiten.Image) {
 			op.GeoM.Translate(float64(tileSize*columnIndex), float64(tileSize*rowIndex+screenPosition-tileSize))
 			tileIndex = gameMap[rowPosition]
 			rowPosition++
-			// fmt.Print("til:", tileIndex, ", ")
 			screen.DrawImage(getTile(tileIndex).(*ebiten.Image), op)
 		}
-		// fmt.Println()
 	}
 
-	g.playerOne.Draw(screen)
+	for _, player := range g.players {
+		player.Draw(screen)
+	}
 
 	for _, playerOneBullet := range g.playerOneBullettPool {
 		playerOneBullet.Draw(screen)
+		if playerOneBullet.active {
+			activeBuls += 1
+		}
 	}
 
-	for _, enemy := range g.enemies {
-		enemy.Draw(screen)
+	for _, playerTwoBullet := range g.playerTwoBullettPool {
+		playerTwoBullet.Draw(screen)
+		if playerTwoBullet.active {
+			activeBuls += 1
+		}
 	}
 
-	// Draw Score/Lifes
+	for _, entity := range g.enemies {
+		entity.Draw(screen)
+		if entity.active {
+			activeEntities += 1
+		}
+	}
+
+	for _, enemyBullet := range g.enemiesBullettPool {
+		enemyBullet.Draw(screen)
+		if enemyBullet.active {
+			activeBuls += 1
+		}
+	}
+
+	// Draw Score/Lives
 	msg := fmt.Sprintf("1UP\nPRESS FIRE")
 	text.Draw(screen, msg, arcadeFont, 5, 20, color.White)
 	msg = fmt.Sprintf("HI-SCORE\n  12200")
@@ -249,8 +391,10 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	text.Draw(screen, msg, arcadeFont, 170, 20, color.White)
 
 	// Draw debug data
-	nl := "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
-	ebitenutil.DebugPrint(screen, fmt.Sprintf("%vTPS: %0.2f FPS: %0.2f Pos:%v", nl, ebiten.ActualTPS(), ebiten.ActualFPS(), g.position))
+	if debug {
+		nl := "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
+		ebitenutil.DebugPrint(screen, fmt.Sprintf("%vTPS: %0.2f FPS: %0.2f \n Pos:%v Ent: %v Blt: %v", nl, ebiten.ActualTPS(), ebiten.ActualFPS(), g.position, activeEntities, activeBuls))
+	}
 }
 
 type GameWithCRTEffect struct {
@@ -298,10 +442,19 @@ func NewGame(flagCRT bool) ebiten.Game {
 	return g
 }
 
+func (g *Game) isCollision(x1, y1, w1, h1, x2, y2, w2, h2 float64) bool {
+	return x1 < x2+w2 &&
+		x1+w1 > x2 &&
+		y1 < y2+h2 &&
+		y1+h1 > y2
+}
+
 func main() {
 	flag.BoolVar(&fullscreen, "fullscreen", false, "run in fullscreen mode")
 	flag.BoolVar(&flagCRT, "crt", false, "enable the CRT simulation")
 	flag.Parse()
+
+	debug = true
 
 	// g := &Game{}
 	// g.init()
