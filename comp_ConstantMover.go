@@ -27,8 +27,8 @@ func (mover *ConstantMover) Update() {
 	// mover.container.position.y += bulletSpeed * math.Sin(mover.container.rotation)
 
 	// entity out fo screen
-	if mover.container.position.x > screenWidth+spriteSize || mover.container.position.x < 0 ||
-		mover.container.position.y > screenHeight+spriteSize || mover.container.position.y < 0 {
+	if mover.container.position.x > screenWidth+spriteSize || mover.container.position.x+spriteSize < 0 ||
+		mover.container.position.y > screenHeight+spriteSize || mover.container.position.y+spriteSize < 0 {
 		mover.container.active = false
 	}
 }

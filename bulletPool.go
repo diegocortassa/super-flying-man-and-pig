@@ -2,19 +2,17 @@ package main
 
 import (
 	_ "embed"
+	"fmt"
 )
 
-const (
-	bulletSpeed = -4
-	// playerOneBulletAnimSpeed = 10.0
-	bulletPoolSize = 5
-)
-
-func initBulletPool(anim []int) []*Entity {
+func initBulletPool(name string, etype entityType, anim []int, bulletPoolSize int, speed Vector, hitbox Box) []*Entity {
 	pool := make([]*Entity, 0)
 	for i := 0; i < bulletPoolSize; i++ {
 		bul := newEntity(SpriteSheetImage, anim, Vector{x: 0, y: 0})
-		mover := NewConstantMover(bul, Vector{0, bulletSpeed})
+		bul.hitBoxes = append(bul.hitBoxes, hitbox)
+		bul.name = name + fmt.Sprint(i)
+		bul.entityType = etype
+		mover := NewConstantMover(bul, speed)
 		bul.addComponent(mover)
 		bul.active = false
 		pool = append(pool, bul)

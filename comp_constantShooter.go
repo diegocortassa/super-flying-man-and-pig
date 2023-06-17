@@ -40,10 +40,9 @@ func (shooter *constantShooter) shoot(x, y float64) {
 	if bul, ok := BullettFromPool(shooter.pool); ok {
 		bul.active = true
 		bul.position.x = shooter.container.position.x
-		bul.position.y = shooter.container.position.y
-		// mover := bul.getComponent(&ConstantMover{})
-		// mover := bul.components[0]
-		// mover.speed = Vector{1, 0}
+		bul.position.y = shooter.container.position.y + spriteSize/2
+		mover := bul.getComponent(&ConstantMover{}).(*ConstantMover)
+		mover.speed = Vector{0, 2}
 		shooter.lastShot = time.Now()
 	}
 	return

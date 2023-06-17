@@ -33,11 +33,18 @@ func Fragment(position vec4, texCoord vec2, color vec4) vec4 {
 
 	// generate scan line effect
 	ambient := 1.0
-	if mod(position.y, 2) == 0 {
+	// if mod(position.y, 2) == 0 {
+	// 	ambient = 0.25
+	// }
+	// if position.y > 100 {
+	// 	ambient = (position.y - 1) / (384 - 1)
+
+	// }
+
+	// if position.y > 600 && position.y < 602 {
+	if position.y == 600.0 {
 		ambient = 0.25
 	}
-	ambient = position.y / 300
-	ambient = (position.y - 1) / (384 - 1)
 
 	// Adjust the texture position to [0, 1].
 	pos := texCoord

@@ -6,11 +6,9 @@ import (
 	"flag"
 	"fmt"
 	"image"
-	"image/color"
 	_ "image/png"
 	"log"
 	"math/rand"
-	"os"
 	"time"
 
 	"golang.org/x/image/font"
@@ -19,9 +17,6 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/audio"
 	"github.com/hajimehoshi/ebiten/v2/audio/mp3"
-	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
-	"github.com/hajimehoshi/ebiten/v2/inpututil"
-	"github.com/hajimehoshi/ebiten/v2/text"
 )
 
 // 256, 320 # 8x10 32 pixel tiles
@@ -52,44 +47,22 @@ const (
 	ModeGame
 	ModeAttract
 	ModeHiscore
+	ModeInsertName
 	ModeGameOver
+	ModeGameEnd
 )
 
 var (
-	debug bool
-
+	debug      bool
 	fullscreen bool
 	flagCRT    bool
 
-	SpriteSheetImage *ebiten.Image
-	//go:embed assets/SpriteSheet.png
-	SpriteSheet_png []byte
+	CurrentMode Mode
 
-	tilesImage *ebiten.Image
-	//go:embed assets/Tiles.png
-	Tiles_png []byte
-
-	// EMBEDDED data
-	//go:embed assets/ARCADEPI.TTF
-	// 	The fonts must be used at the intended point size for optimal results.
-	//  Arcadepix at at 10 points or multiplyed by whole number eg. 20, 30, 40
-	arcadeFont_ttf []byte
-	arcadeFont     font.Face
+	lastUpdate time.Time
 
 	//go:embed crt.go
 	crtGo []byte
-
-	audioContext *audio.Context
-	//go:embed assets/2_Stage_lo_hi.mp3
-	audioTheme_mp3 []byte
-
-	iconImage *ebiten.Image
-	//go:embed "assets/Icon.png"
-	iconImage_png []byte
-
-	// END EMBEDDED data
-
-	lastUpdate time.Time
 )
 
 // Game controls overall gameplay.
@@ -107,11 +80,40 @@ type Game struct {
 	playerTwoBullettPool []*Entity
 	enemies              []*Entity
 	enemiesBullettPool   []*Entity
+	lastEvent            time.Time
 }
 
 func init() {
 
 	rand.Seed(time.Now().UnixNano())
+
+	// Prepare audio
+	audioContext = audio.NewContext(44100)
+	var err error
+	audio1StageTheme, err = mp3.DecodeWithoutResampling(bytes.NewReader(audio1StageTheme_mp3))
+	if err != nil {
+		log.Fatal(err)
+	}
+	audio2StageTheme, err = mp3.DecodeWithoutResampling(bytes.NewReader(audio2StageTheme_mp3))
+	if err != nil {
+		log.Fatal(err)
+	}
+	audioBossFightTheme, err = mp3.DecodeWithoutResampling(bytes.NewReader(audioBossFightTheme_mp3))
+	if err != nil {
+		log.Fatal(err)
+	}
+	audioStageSelectTheme, err = mp3.DecodeWithoutResampling(bytes.NewReader(audioStageSelectTheme_mp3))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	soundThemeSource := audio.NewInfiniteLoop(audio2StageTheme, audio2StageTheme.Length()+1)
+	audioPlayer, err = audio.NewPlayer(audioContext, soundThemeSource)
+	if err != nil {
+		log.Fatal(err)
+	}
+	audioPlayer.SetVolume(0.05)
+	audioPlayer.Play()
 
 	tt, err := opentype.Parse(arcadeFont_ttf)
 	if err != nil {
@@ -126,30 +128,30 @@ func init() {
 		log.Fatal(err)
 	}
 
-	// Load and play game theme
-	audioContext = audio.NewContext(22050)
-
-	soundTheme, err := mp3.DecodeWithoutResampling(bytes.NewReader(audioTheme_mp3))
-	if err != nil {
-		log.Fatal(err)
-	}
-	soundThemeSource := audio.NewInfiniteLoop(soundTheme, soundTheme.Length())
-	audioThemePlayer, err := audio.NewPlayer(audioContext, soundThemeSource)
-	if err != nil {
-		log.Fatal(err)
-	}
-	audioThemePlayer.SetVolume(0.02)
-	audioThemePlayer.Play()
-
 	// Decode map tiles from the image file's byte slice.
 	img, _, err := image.Decode(bytes.NewReader(Tiles_png))
 	if err != nil {
 		log.Fatal(err)
 	}
 	tilesImage = ebiten.NewImageFromImage(img)
+
+	img, _, err = image.Decode(bytes.NewReader(TitleTextImage_png))
+	if err != nil {
+		log.Fatal(err)
+	}
+	titleTextImage = ebiten.NewImageFromImage(img)
+
+	img, _, err = image.Decode(bytes.NewReader(TitleImage_png))
+	if err != nil {
+		log.Fatal(err)
+	}
+	titleImage = ebiten.NewImageFromImage(img)
 }
 
 func (g *Game) init() {
+	g.mode = ModeTitle
+
+	g.lastEvent = time.Now()
 
 	// Decode sprite sheet from the image file's byte slice.
 	img, _, err := image.Decode(bytes.NewReader(SpriteSheet_png))
@@ -164,7 +166,9 @@ func (g *Game) init() {
 		animSuperFlyingMan,
 		Vector{x: (screenWidth - spriteSize) / 4, y: screenHeight - spriteSize - 20},
 	)
-
+	playerOne.hitBoxes = append(playerOne.hitBoxes, Box{5, 2, 15, 20})
+	playerOne.name = "P1"
+	playerOne.lives = 3
 	mover := NewKeyboardMover(
 		playerOne,
 		Keybinds{
@@ -178,8 +182,7 @@ func (g *Game) init() {
 		Vector{1, 1},
 	)
 	playerOne.addComponent(mover)
-	g.playerOneBullettPool = initBulletPool(animSuperFlyingManPew)
-	log.Println("main", len(g.playerOneBullettPool))
+	g.playerOneBullettPool = initBulletPool("P1Bullet", typePlayerOneBullet, animSuperFlyingManPew, 5, Vector{0, -4}, Box{8, 2, 8, 8})
 	shooter := NewKeyboardShooter(
 		playerOne,
 		ebiten.KeyControlLeft,
@@ -197,6 +200,9 @@ func (g *Game) init() {
 		animPig,
 		Vector{x: (screenWidth - spriteSize) / 4 * 3, y: screenHeight - spriteSize - 20},
 	)
+	playerTwo.hitBoxes = append(playerTwo.hitBoxes, Box{5, 2, 15, 20})
+	playerTwo.name = "P2"
+	playerTwo.lives = 3
 	mover = NewKeyboardMover(
 		playerTwo,
 		Keybinds{
@@ -211,7 +217,7 @@ func (g *Game) init() {
 	)
 	playerTwo.addComponent(mover)
 
-	g.playerTwoBullettPool = initBulletPool(animPigPew)
+	g.playerTwoBullettPool = initBulletPool("P2Bullet", typePlayerTwoBullet, animPigPew, 5, Vector{0, -4}, Box{8, 2, 8, 8})
 	shooter = NewKeyboardShooter(
 		playerTwo,
 		ebiten.KeyQ,
@@ -223,178 +229,69 @@ func (g *Game) init() {
 	g.players = append(g.players, playerTwo)
 	// #endregion player two
 
-	// Enemies
-	var enemy *Entity
-	g.enemiesBullettPool = initBulletPool(animEnemyPew)
-
-	enemy = newEntity(
-		SpriteSheetImage,
-		animEnemyThing,
-		Vector{x: 30, y: 0},
-	)
-	cmover := NewConstantMover(enemy, Vector{x: 0.2, y: 1})
-	enemy.addComponent(cmover)
-	g.enemies = append(g.enemies, enemy)
-
-	enemy = newEntity(
-		SpriteSheetImage,
-		animEnemyFlyingMan1,
-		Vector{x: 0, y: 0},
-	)
-	cmover = NewConstantMover(enemy, Vector{x: 0.3, y: 0.3})
-	enemy.addComponent(cmover)
-	cshooter := NewConstantShooter(
-		enemy,
-		time.Millisecond*250,
-		g.enemiesBullettPool,
-	)
-	enemy.addComponent(cshooter)
-	g.enemies = append(g.enemies, enemy)
-
-	// ne1 := newEnemyFlyingMan1(150, 0)
-	// g.enemies = append(g.enemies, &ne1)
-	// ne2 := newEnemyFlyingMan1(180, 0)
-	// g.enemies = append(g.enemies, &ne2)
-	// ne3 := newEnemyFlyingMan1(200, 0)
-	// g.enemies = append(g.enemies, &ne3)
+	// Enemies Bullets
+	g.enemiesBullettPool = initBulletPool("EnemyBullet", typeEnemyBullet, animEnemyPew, 10, Vector{0, 0}, Box{8, 8, 8, 8})
 }
 
 func (g *Game) reset() {
-	g.position = 0
+
 	g.enemies = nil
+
+	g.mode = ModeTitle
+	g.gameMap = nil
+	g.position = 0
+	g.players = nil
+	g.playerOneBullettPool = nil
+	g.playerTwoBullettPool = nil
+	g.enemies = nil
+	g.enemiesBullettPool = nil
+	g.lastEvent = time.Now()
 	g.init()
 }
 
 func (g *Game) Update() error {
 
-	if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
-		log.Println("Bye")
-		os.Exit(0)
-	}
-	if inpututil.IsKeyJustPressed(ebiten.KeyF) {
-		if ebiten.IsFullscreen() {
-			ebiten.SetFullscreen(false)
-		} else {
-			ebiten.SetFullscreen(true)
-		}
-	}
-	if inpututil.IsKeyJustPressed(ebiten.KeyR) {
-		g.reset()
-	}
+	g.UpdateSequencer()
 
-	for _, player := range g.players {
-		player.Update(g)
-	}
-
-	for _, playerOneBullet := range g.playerOneBullettPool {
-		playerOneBullet.Update(g)
-	}
-
-	for _, playerTwoBullet := range g.playerTwoBullettPool {
-		playerTwoBullet.Update(g)
-	}
-
-	for _, entity := range g.enemies {
-		entity.Update(g)
-	}
-
-	for _, enemyBullet := range g.enemiesBullettPool {
-		enemyBullet.Update(g)
-	}
-
-	// p1 := g.entities[0]
-	// p2 := g.entities[1]
-	// if g.isCollision(p2.position.x, p2.position.y, spriteSize, spriteSize, p1.position.x, p1.position.y, spriteSize, spriteSize) {
-	// 	log.Println("Game Over")
-	// 	// ebiten.SetRunnableOnUnfocused(true)
-	// 	// return nil
-	// }
-
-	if time.Since(lastUpdate) > scrollSpeed*time.Millisecond {
-		lastUpdate = time.Now()
-		g.position += 1 // pixel lines per scroll tick
-		// tiles in a screen tilesScreenWidth*tilesScreenHeight
-		// as g.position is the low line pixel index
-		// we reset to 0 when we have only one screen left of tiles
-		if (g.position/tileSize)*tilesScreenWidth >= len(gameMap)-(tilesScreenWidth*tilesScreenHeight) {
-			g.position = 0
-		}
-		// g.position += 8
-		// if g.position >= len(gameMap)-8*8 {
-		// 	g.position = 0
-		// }
+	switch g.mode {
+	case ModeTitle:
+		g.UpdateTileMode()
+	case ModeAttract:
+		g.UpdateGameMode()
+	case ModeGame:
+		g.UpdateGameMode()
+	case ModeGameOver:
+		g.UpdateGameOverMode()
+	case ModeInsertName:
+		g.UpdateGameMode()
+	case ModeHiscore:
+		g.UpdateGameMode()
+	case ModeGameEnd:
+		g.UpdateGameMode()
 	}
 
 	return nil
 }
 
 func (g *Game) Draw(screen *ebiten.Image) {
-	activeBuls := 0
-	activeEntities := 0
-	tileIndex := 0
-	// Draw world window
-	rowPosition := (g.position / tileSize) * tilesScreenWidth
-	screenPosition := (g.position % tileSize)
-	// for rowIndex := tilesScreenHeight - 1; rowIndex >= 0; rowIndex-- { // use this to show scrolling trick
-	for rowIndex := tilesScreenHeight; rowIndex >= 0; rowIndex-- {
-		// fmt.Println("WPos: ", g.position, "SPos:", screenPosition, "RPos:", rowPosition, "Row:", rowIndex, "-")
-		for columnIndex := 0; columnIndex < tilesScreenWidth; columnIndex++ {
-			// fmt.Print("col:", columnIndex, " ")
 
-			op := &ebiten.DrawImageOptions{}
-			// op.GeoM.Translate(float64(tileSize*columnIndex), float64(tileSize*rowIndex+screenPosition)) // use this to show scrolling trick
-			op.GeoM.Translate(float64(tileSize*columnIndex), float64(tileSize*rowIndex+screenPosition-tileSize))
-			tileIndex = gameMap[rowPosition]
-			rowPosition++
-			screen.DrawImage(getTile(tileIndex).(*ebiten.Image), op)
-		}
+	switch g.mode {
+	case ModeTitle:
+		g.DrawTitleMode(screen)
+	case ModeAttract:
+		g.DrawGameMode(screen)
+	case ModeGame:
+		g.DrawGameMode(screen)
+	case ModeGameOver:
+		g.DrawGameOverMode(screen)
+	case ModeInsertName:
+		g.DrawGameMode(screen)
+	case ModeHiscore:
+		g.DrawGameMode(screen)
+	case ModeGameEnd:
+		g.DrawGameMode(screen)
 	}
 
-	for _, player := range g.players {
-		player.Draw(screen)
-	}
-
-	for _, playerOneBullet := range g.playerOneBullettPool {
-		playerOneBullet.Draw(screen)
-		if playerOneBullet.active {
-			activeBuls += 1
-		}
-	}
-
-	for _, playerTwoBullet := range g.playerTwoBullettPool {
-		playerTwoBullet.Draw(screen)
-		if playerTwoBullet.active {
-			activeBuls += 1
-		}
-	}
-
-	for _, entity := range g.enemies {
-		entity.Draw(screen)
-		if entity.active {
-			activeEntities += 1
-		}
-	}
-
-	for _, enemyBullet := range g.enemiesBullettPool {
-		enemyBullet.Draw(screen)
-		if enemyBullet.active {
-			activeBuls += 1
-		}
-	}
-
-	// Draw Score/Lives
-	msg := fmt.Sprintf("1UP\nPRESS FIRE")
-	text.Draw(screen, msg, arcadeFont, 5, 20, color.White)
-	msg = fmt.Sprintf("HI-SCORE\n  12200")
-	text.Draw(screen, msg, arcadeFont, 90, 20, color.White)
-	msg = fmt.Sprintf("2UP\nPRESS FIRE")
-	text.Draw(screen, msg, arcadeFont, 170, 20, color.White)
-
-	// Draw debug data
-	if debug {
-		nl := "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
-		ebitenutil.DebugPrint(screen, fmt.Sprintf("%vTPS: %0.2f FPS: %0.2f \n Pos:%v Ent: %v Blt: %v", nl, ebiten.ActualTPS(), ebiten.ActualFPS(), g.position, activeEntities, activeBuls))
-	}
 }
 
 type GameWithCRTEffect struct {
@@ -404,7 +301,7 @@ type GameWithCRTEffect struct {
 }
 
 func (g *GameWithCRTEffect) DrawFinalScreen(screen ebiten.FinalScreen, offscreen *ebiten.Image, geoM ebiten.GeoM) {
-	fmt.Println("DrawFinalScreen")
+	DebugPrintf("DrawFinalScreen")
 
 	if g.crtShader == nil {
 		s, err := ebiten.NewShader(crtGo)
@@ -442,19 +339,11 @@ func NewGame(flagCRT bool) ebiten.Game {
 	return g
 }
 
-func (g *Game) isCollision(x1, y1, w1, h1, x2, y2, w2, h2 float64) bool {
-	return x1 < x2+w2 &&
-		x1+w1 > x2 &&
-		y1 < y2+h2 &&
-		y1+h1 > y2
-}
-
 func main() {
 	flag.BoolVar(&fullscreen, "fullscreen", false, "run in fullscreen mode")
 	flag.BoolVar(&flagCRT, "crt", false, "enable the CRT simulation")
+	flag.BoolVar(&debug, "debug", false, "enable debug")
 	flag.Parse()
-
-	debug = true
 
 	// g := &Game{}
 	// g.init()
@@ -468,6 +357,7 @@ func main() {
 	// ebiten.SetWindowResizable(true)
 	// ebiten.SetScreenTransparent(true)
 	// ebiten.SetWindowDecorated(false)
+	// Saves GPU if screen is not changed
 	// ebiten.SetScreenClearedEveryFrame(false)
 	// Decode player one spritesheet from the image file's byte slice.
 	// var iconImg []image.Image
