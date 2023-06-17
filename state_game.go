@@ -10,7 +10,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/text"
 )
 
-func (g *Game) UpdateGameMode() {
+func (g *Game) UpdateGameState() {
 
 	DebugPrintf("--- Update Loop ---")
 
@@ -60,7 +60,7 @@ func (g *Game) UpdateGameMode() {
 	}
 }
 
-func (g *Game) DrawGameMode(screen *ebiten.Image) {
+func (g *Game) DrawGameState(screen *ebiten.Image) {
 	activeBuls := 0
 	activeEntities := 0
 	totalEntities := 0

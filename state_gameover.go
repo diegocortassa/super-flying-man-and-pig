@@ -9,10 +9,11 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-func (g *Game) UpdateGameOverMode() {
+func (g *Game) UpdateGameOverState() {
+	// TBD
 }
 
-func (g *Game) DrawGameOverMode(screen *ebiten.Image) {
+func (g *Game) DrawGameOverState(screen *ebiten.Image) {
 	var msg string
 	textColor := color.RGBA{0xf6, 0x00, 0x00, 0xff}
 	msg = fmt.Sprintf("GAME OVER")

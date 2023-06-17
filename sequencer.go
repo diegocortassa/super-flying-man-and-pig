@@ -50,13 +50,13 @@ func (g *Game) UpdateSequencer() {
 		g.reset()
 	}
 
-	if g.mode == ModeTitle {
+	if g.state == StateTitle {
 		if inpututil.IsKeyJustPressed(ebiten.KeyControlLeft) || inpututil.IsKeyJustPressed(ebiten.KeyQ) {
-			g.mode = ModeGame
+			g.state = StateGame
 		}
 	}
 
-	if g.mode == ModeGame {
+	if g.state == StateGame {
 		if !g.players[0].active && !g.players[1].active {
 
 			// soundThemeSource := audio.NewInfiniteLoop(audioStageSelectTheme, audioStageSelectTheme.Length())
@@ -68,7 +68,7 @@ func (g *Game) UpdateSequencer() {
 			// audioPlayer.Play()
 
 			g.reset()
-			g.mode = ModeGameOver
+			g.state = StateGameOver
 		}
 	}
 

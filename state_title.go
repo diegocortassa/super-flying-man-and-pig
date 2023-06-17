@@ -15,10 +15,11 @@ var (
 	freePlayOn bool // used to blink "free play" message
 )
 
-func (g *Game) UpdateTileMode() {
+func (g *Game) UpdateTileState() {
+	// TBD
 }
 
-func (g *Game) DrawTitleMode(screen *ebiten.Image) {
+func (g *Game) DrawTitleState(screen *ebiten.Image) {
 
 	var msg string
 

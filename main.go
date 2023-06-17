@@ -40,16 +40,16 @@ const (
 	scrollSpeed       = 30 // speed in 1 pixel per microsecond
 )
 
-type Mode int
+type State int
 
 const (
-	ModeTitle Mode = iota
-	ModeGame
-	ModeAttract
-	ModeHiscore
-	ModeInsertName
-	ModeGameOver
-	ModeGameEnd
+	StateTitle State = iota
+	StateGame
+	StateAttract
+	StateHiscore
+	StateInsertName
+	StateGameOver
+	StateGameEnd
 )
 
 var (
@@ -57,7 +57,8 @@ var (
 	fullscreen bool
 	flagCRT    bool
 
-	CurrentMode Mode
+	CurrentState  State
+	PreviousState State
 
 	lastUpdate time.Time
 
@@ -68,7 +69,7 @@ var (
 // Game controls overall gameplay.
 type Game struct {
 	crtShader *ebiten.Shader
-	mode      Mode
+	state     State
 	gameMap   []int
 	position  int
 
@@ -149,7 +150,7 @@ func init() {
 }
 
 func (g *Game) init() {
-	g.mode = ModeTitle
+	g.state = StateTitle
 
 	g.lastEvent = time.Now()
 
@@ -237,7 +238,7 @@ func (g *Game) reset() {
 
 	g.enemies = nil
 
-	g.mode = ModeTitle
+	g.state = StateTitle
 	g.gameMap = nil
 	g.position = 0
 	g.players = nil
@@ -253,21 +254,21 @@ func (g *Game) Update() error {
 
 	g.UpdateSequencer()
 
-	switch g.mode {
-	case ModeTitle:
-		g.UpdateTileMode()
-	case ModeAttract:
-		g.UpdateGameMode()
-	case ModeGame:
-		g.UpdateGameMode()
-	case ModeGameOver:
-		g.UpdateGameOverMode()
-	case ModeInsertName:
-		g.UpdateGameMode()
-	case ModeHiscore:
-		g.UpdateGameMode()
-	case ModeGameEnd:
-		g.UpdateGameMode()
+	switch g.state {
+	case StateTitle:
+		g.UpdateTileState()
+	case StateAttract:
+		g.UpdateGameState()
+	case StateGame:
+		g.UpdateGameState()
+	case StateGameOver:
+		g.UpdateGameOverState()
+	case StateInsertName:
+		g.UpdateGameState()
+	case StateHiscore:
+		g.UpdateGameState()
+	case StateGameEnd:
+		g.UpdateGameState()
 	}
 
 	return nil
@@ -275,21 +276,21 @@ func (g *Game) Update() error {
 
 func (g *Game) Draw(screen *ebiten.Image) {
 
-	switch g.mode {
-	case ModeTitle:
-		g.DrawTitleMode(screen)
-	case ModeAttract:
-		g.DrawGameMode(screen)
-	case ModeGame:
-		g.DrawGameMode(screen)
-	case ModeGameOver:
-		g.DrawGameOverMode(screen)
-	case ModeInsertName:
-		g.DrawGameMode(screen)
-	case ModeHiscore:
-		g.DrawGameMode(screen)
-	case ModeGameEnd:
-		g.DrawGameMode(screen)
+	switch g.state {
+	case StateTitle:
+		g.DrawTitleState(screen)
+	case StateAttract:
+		g.DrawGameState(screen)
+	case StateGame:
+		g.DrawGameState(screen)
+	case StateGameOver:
+		g.DrawGameOverState(screen)
+	case StateInsertName:
+		g.DrawGameState(screen)
+	case StateHiscore:
+		g.DrawGameState(screen)
+	case StateGameEnd:
+		g.DrawGameState(screen)
 	}
 
 }
