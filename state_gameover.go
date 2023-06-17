@@ -21,7 +21,7 @@ func (g *Game) DrawGameOverState(screen *ebiten.Image) {
 
 	// if time.Now().UnixMilli()%500 == 0 {
 	if time.Now().Second()%2 == 0 {
-		msg = fmt.Sprintf("PRESS R TO RESTART")
+		msg = fmt.Sprintf("PRESS FIRE")
 		DrawTextByCenter(screen, msg, arcadeFont, screenWidth/2, screenHeight/2+30, color.White)
 	}
 }

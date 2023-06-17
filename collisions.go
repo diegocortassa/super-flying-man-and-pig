@@ -45,8 +45,10 @@ func Collide(l1, l2 []*Entity, g *Game) {
 func CheckCollisions(g *Game) {
 	Collide(g.playerOneBullettPool, g.enemies, g)
 	Collide(g.playerTwoBullettPool, g.enemies, g)
-	Collide(g.enemiesBullettPool, g.players, g)
-	Collide(g.enemies, g.players, g)
+	Collide(g.enemiesBullettPool, []*Entity{g.playerOne}, g)
+	Collide(g.enemiesBullettPool, []*Entity{g.playerTwo}, g)
+	Collide(g.enemies, []*Entity{g.playerOne}, g)
+	Collide(g.enemies, []*Entity{g.playerTwo}, g)
 
 }
 
@@ -54,12 +56,18 @@ func HandleCollision(e1, e2 *Entity, g *Game) {
 	if e1.entityType == typePlayerOneBullet {
 		e1.active = false
 		e2.active = false
-		g.players[0].scores += e2.scoreValue
+		g.playerOne.scores += e2.scoreValue
+		if g.playerOne.scores > g.hiScores {
+			g.hiScores = g.playerOne.scores
+		}
 	}
 	if e1.entityType == typePlayerTwoBullet {
 		e1.active = false
 		e2.active = false
-		g.players[1].scores += e2.scoreValue
+		g.playerTwo.scores += e2.scoreValue
+		if g.playerTwo.scores > g.hiScores {
+			g.hiScores = g.playerTwo.scores
+		}
 	}
 	if e1.entityType == typeEnemyBullet || e1.entityType == typeEnemy {
 		e1.active = false

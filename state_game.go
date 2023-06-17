@@ -14,10 +14,11 @@ func (g *Game) UpdateGameState() {
 
 	DebugPrintf("--- Update Loop ---")
 
-	for _, player := range g.players {
-		DebugPrintf("player", player.name, player.active)
-		player.Update(g)
-	}
+	DebugPrintf("player", g.playerOne.name, g.playerOne.active)
+	g.playerOne.Update(g)
+
+	DebugPrintf("player", g.playerTwo.name, g.playerTwo.active)
+	g.playerTwo.Update(g)
 
 	for _, playerOneBullet := range g.playerOneBullettPool {
 		DebugPrintf("playerOneBullet", playerOneBullet.name, playerOneBullet.active)
@@ -42,9 +43,9 @@ func (g *Game) UpdateGameState() {
 
 	CheckCollisions(g)
 
-	if time.Since(lastUpdate) > time.Millisecond*scrollSpeed {
+	if time.Since(g.lastEvent) > time.Millisecond*scrollSpeed {
 		spawnEnemies(g)
-		lastUpdate = time.Now()
+		g.lastEvent = time.Now()
 		g.position += 1 // pixel lines per scroll tick
 		// tiles in a screen tilesScreenWidth*tilesScreenHeight
 		// as g.position is the low line pixel index
@@ -83,9 +84,8 @@ func (g *Game) DrawGameState(screen *ebiten.Image) {
 		}
 	}
 
-	for _, player := range g.players {
-		player.Draw(screen)
-	}
+	g.playerOne.Draw(screen)
+	g.playerTwo.Draw(screen)
 
 	for _, playerOneBullet := range g.playerOneBullettPool {
 		playerOneBullet.Draw(screen)
@@ -119,29 +119,29 @@ func (g *Game) DrawGameState(screen *ebiten.Image) {
 	// Draw Score/Lives
 	var msg string
 	textColor := color.RGBA{0xf6, 0xf4, 0x0d, 0xff}
-	if g.players[0].active {
-		msg = fmt.Sprintf("1UP %d\n%05d", g.players[0].lives, g.players[0].scores)
+	if g.playerOne.active {
+		msg = fmt.Sprintf("1UP %d\n%05d", g.playerOne.lives, g.playerOne.scores)
 	} else {
 		if time.Now().Second()%2 == 0 {
 			msg = fmt.Sprintf("1UP\nPRESS FIRE")
 		} else {
-			msg = fmt.Sprintf("1UP\n%05d", g.players[0].scores)
+			msg = fmt.Sprintf("1UP\n%05d", g.playerOne.scores)
 		}
 	}
 	text.Draw(screen, msg, arcadeFont, 6, 21, color.Black)
 	text.Draw(screen, msg, arcadeFont, 5, 20, textColor)
 
-	msg = fmt.Sprintf("HI-SCORE\n  12200")
+	msg = fmt.Sprintf("HI-SCORE\n  %05d", g.hiScores)
 	text.Draw(screen, msg, arcadeFont, 91, 21, color.Black)
 	text.Draw(screen, msg, arcadeFont, 90, 20, textColor)
 
-	if g.players[1].active {
-		msg = fmt.Sprintf("2UP %d\n%05d", g.players[1].lives, g.players[1].scores)
+	if g.playerTwo.active {
+		msg = fmt.Sprintf("2UP %d\n%05d", g.playerTwo.lives, g.playerTwo.scores)
 	} else {
 		if time.Now().Second()%2 == 0 {
 			msg = fmt.Sprintf("2UP\nPRESS FIRE")
 		} else {
-			msg = fmt.Sprintf("2UP\n%05d", g.players[1].scores)
+			msg = fmt.Sprintf("2UP\n%05d", g.playerTwo.scores)
 		}
 	}
 	text.Draw(screen, msg, arcadeFont, 171, 21, color.Black)

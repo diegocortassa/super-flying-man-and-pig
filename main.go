@@ -11,12 +11,7 @@ import (
 	"math/rand"
 	"time"
 
-	"golang.org/x/image/font"
-	"golang.org/x/image/font/opentype"
-
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/audio"
-	"github.com/hajimehoshi/ebiten/v2/audio/mp3"
 )
 
 // 256, 320 # 8x10 32 pixel tiles
@@ -43,7 +38,8 @@ const (
 type State int
 
 const (
-	StateTitle State = iota
+	StateInit State = iota
+	StateTitle
 	StateGame
 	StateAttract
 	StateHiscore
@@ -57,11 +53,6 @@ var (
 	fullscreen bool
 	flagCRT    bool
 
-	CurrentState  State
-	PreviousState State
-
-	lastUpdate time.Time
-
 	//go:embed crt.go
 	crtGo []byte
 )
@@ -72,106 +63,69 @@ type Game struct {
 	state     State
 	gameMap   []int
 	position  int
+	hiScores  int
 
 	touchIDs   []ebiten.TouchID
 	gamepadIDs []ebiten.GamepadID
 
-	players              []*Entity
+	playerOne            *Entity
+	playerTwo            *Entity
 	playerOneBullettPool []*Entity
 	playerTwoBullettPool []*Entity
 	enemies              []*Entity
 	enemiesBullettPool   []*Entity
 	lastEvent            time.Time
+
+	CurrentState        State
+	PreviousState       State
+	lastStateTransition time.Time
 }
 
 func init() {
-
+	// initializations before creating the game
 	rand.Seed(time.Now().UnixNano())
-
-	// Prepare audio
-	audioContext = audio.NewContext(44100)
-	var err error
-	audio1StageTheme, err = mp3.DecodeWithoutResampling(bytes.NewReader(audio1StageTheme_mp3))
-	if err != nil {
-		log.Fatal(err)
-	}
-	audio2StageTheme, err = mp3.DecodeWithoutResampling(bytes.NewReader(audio2StageTheme_mp3))
-	if err != nil {
-		log.Fatal(err)
-	}
-	audioBossFightTheme, err = mp3.DecodeWithoutResampling(bytes.NewReader(audioBossFightTheme_mp3))
-	if err != nil {
-		log.Fatal(err)
-	}
-	audioStageSelectTheme, err = mp3.DecodeWithoutResampling(bytes.NewReader(audioStageSelectTheme_mp3))
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	soundThemeSource := audio.NewInfiniteLoop(audio2StageTheme, audio2StageTheme.Length()+1)
-	audioPlayer, err = audio.NewPlayer(audioContext, soundThemeSource)
-	if err != nil {
-		log.Fatal(err)
-	}
-	audioPlayer.SetVolume(0.05)
-	audioPlayer.Play()
-
-	tt, err := opentype.Parse(arcadeFont_ttf)
-	if err != nil {
-		log.Fatal(err)
-	}
-	arcadeFont, err = opentype.NewFace(tt, &opentype.FaceOptions{
-		Size:    10,
-		DPI:     72,
-		Hinting: font.HintingFull,
-	})
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// Decode map tiles from the image file's byte slice.
-	img, _, err := image.Decode(bytes.NewReader(Tiles_png))
-	if err != nil {
-		log.Fatal(err)
-	}
-	tilesImage = ebiten.NewImageFromImage(img)
-
-	img, _, err = image.Decode(bytes.NewReader(TitleTextImage_png))
-	if err != nil {
-		log.Fatal(err)
-	}
-	titleTextImage = ebiten.NewImageFromImage(img)
-
-	img, _, err = image.Decode(bytes.NewReader(TitleImage_png))
-	if err != nil {
-		log.Fatal(err)
-	}
-	titleImage = ebiten.NewImageFromImage(img)
+	initAssets()
 }
 
 func (g *Game) init() {
-	g.state = StateTitle
-
+	// initializations before running the game
+	g.state = StateInit
+	g.hiScores = 1420
+	g.PreviousState = StateInit
+	g.lastStateTransition = time.Now()
 	g.lastEvent = time.Now()
+	g.reset()
+	g.resetPlayerOne()
+	g.resetPlayerTwo()
+}
 
-	// Decode sprite sheet from the image file's byte slice.
-	img, _, err := image.Decode(bytes.NewReader(SpriteSheet_png))
-	if err != nil {
-		log.Fatal(err)
-	}
-	SpriteSheetImage = ebiten.NewImageFromImage(img)
+func (g *Game) reset() {
+	g.position = 0
+	// Enemies
+	g.enemies = nil
+	// Enemies Bullets
+	g.enemiesBullettPool = initBulletPool("EnemyBullet", typeEnemyBullet, animEnemyPew, 10, Vector{0, 0}, Box{8, 8, 8, 8})
+}
 
-	// #region player one
-	playerOne := newEntity(
-		SpriteSheetImage,
-		animSuperFlyingMan,
+func (g *Game) resetPlayerOne() {
+	// player one
+	g.playerOne = newEntity(
+		"P1",
 		Vector{x: (screenWidth - spriteSize) / 4, y: screenHeight - spriteSize - 20},
 	)
-	playerOne.hitBoxes = append(playerOne.hitBoxes, Box{5, 2, 15, 20})
-	playerOne.name = "P1"
-	playerOne.lives = 3
+	g.playerOne.active = false
+	g.playerOne.hitBoxes = append(g.playerOne.hitBoxes, Box{5, 2, 15, 20})
+
+	sequences := map[string]*sequence{
+		"idle":    newSequence(SpriteSheetImage, animSuperFlyingMan, animSampleRate, true),
+		"destroy": newSequence(SpriteSheetImage, animSuperFlyingManDie, animSampleRate, true),
+	}
+	animator := newAnimator(g.playerOne, sequences, "idle")
+	g.playerOne.addComponent(animator)
+
+	g.playerOne.lives = 3
 	mover := NewKeyboardMover(
-		playerOne,
+		g.playerOne,
 		Keybinds{
 			Up:        ebiten.KeyArrowUp,
 			Down:      ebiten.KeyArrowDown,
@@ -182,30 +136,37 @@ func (g *Game) init() {
 		},
 		Vector{1, 1},
 	)
-	playerOne.addComponent(mover)
+	g.playerOne.addComponent(mover)
+
 	g.playerOneBullettPool = initBulletPool("P1Bullet", typePlayerOneBullet, animSuperFlyingManPew, 5, Vector{0, -4}, Box{8, 2, 8, 8})
 	shooter := NewKeyboardShooter(
-		playerOne,
+		g.playerOne,
 		ebiten.KeyControlLeft,
 		g.playerOneBullettPool,
 		time.Millisecond*250,
 	)
-	playerOne.addComponent(shooter)
+	g.playerOne.addComponent(shooter)
+}
 
-	g.players = append(g.players, playerOne)
-	// #endregion player one
-
-	// #region player two
-	playerTwo := newEntity(
-		SpriteSheetImage,
-		animPig,
+func (g *Game) resetPlayerTwo() {
+	// player two
+	g.playerTwo = newEntity(
+		"P2",
 		Vector{x: (screenWidth - spriteSize) / 4 * 3, y: screenHeight - spriteSize - 20},
 	)
-	playerTwo.hitBoxes = append(playerTwo.hitBoxes, Box{5, 2, 15, 20})
-	playerTwo.name = "P2"
-	playerTwo.lives = 3
-	mover = NewKeyboardMover(
-		playerTwo,
+	g.playerTwo.active = false
+	g.playerTwo.hitBoxes = append(g.playerTwo.hitBoxes, Box{5, 2, 15, 20})
+
+	sequences := map[string]*sequence{
+		"idle":    newSequence(SpriteSheetImage, animPig, animSampleRate, true),
+		"destroy": newSequence(SpriteSheetImage, animPigDie, animSampleRate, true),
+	}
+	animator := newAnimator(g.playerTwo, sequences, "idle")
+	g.playerTwo.addComponent(animator)
+
+	g.playerTwo.lives = 3
+	mover := NewKeyboardMover(
+		g.playerTwo,
 		Keybinds{
 			Up:        ebiten.KeyW,
 			Down:      ebiten.KeyS,
@@ -216,38 +177,16 @@ func (g *Game) init() {
 		},
 		Vector{1, 1},
 	)
-	playerTwo.addComponent(mover)
+	g.playerTwo.addComponent(mover)
 
 	g.playerTwoBullettPool = initBulletPool("P2Bullet", typePlayerTwoBullet, animPigPew, 5, Vector{0, -4}, Box{8, 2, 8, 8})
-	shooter = NewKeyboardShooter(
-		playerTwo,
+	shooter := NewKeyboardShooter(
+		g.playerTwo,
 		ebiten.KeyQ,
 		g.playerTwoBullettPool,
 		time.Millisecond*250,
 	)
-	playerTwo.addComponent(shooter)
-
-	g.players = append(g.players, playerTwo)
-	// #endregion player two
-
-	// Enemies Bullets
-	g.enemiesBullettPool = initBulletPool("EnemyBullet", typeEnemyBullet, animEnemyPew, 10, Vector{0, 0}, Box{8, 8, 8, 8})
-}
-
-func (g *Game) reset() {
-
-	g.enemies = nil
-
-	g.state = StateTitle
-	g.gameMap = nil
-	g.position = 0
-	g.players = nil
-	g.playerOneBullettPool = nil
-	g.playerTwoBullettPool = nil
-	g.enemies = nil
-	g.enemiesBullettPool = nil
-	g.lastEvent = time.Now()
-	g.init()
+	g.playerTwo.addComponent(shooter)
 }
 
 func (g *Game) Update() error {

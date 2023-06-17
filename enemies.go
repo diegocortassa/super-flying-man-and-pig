@@ -19,14 +19,20 @@ func cleanEnemyList(g *Game) {
 
 func spawnBaloon(g *Game, x, y float64, speed Vector) {
 	enemy := newEntity(
-		SpriteSheetImage,
-		animEnemyBaloon,
+		"Baloon",
 		Vector{x: x, y: y},
 	)
-	enemy.name = "Baloon"
 	enemy.entityType = typeEnemy
-	enemy.scoreValue = 50
+	enemy.scoreValue = 20
 	enemy.hitBoxes = append(enemy.hitBoxes, Box{5, 2, 15, 20})
+
+	sequences := map[string]*sequence{
+		"idle":    newSequence(SpriteSheetImage, animEnemyBaloon, animSampleRate, true),
+		"destroy": newSequence(SpriteSheetImage, animEnemyCat, animSampleRate, true),
+	}
+	animator := newAnimator(enemy, sequences, "idle")
+	enemy.addComponent(animator)
+
 	cmover := NewConstantMover(enemy, Vector{x: 0.2, y: 1})
 	enemy.addComponent(cmover)
 	g.enemies = append(g.enemies, enemy)
@@ -34,14 +40,20 @@ func spawnBaloon(g *Game, x, y float64, speed Vector) {
 
 func spawnThing(g *Game, x, y float64, speed Vector) {
 	enemy := newEntity(
-		SpriteSheetImage,
-		animEnemyThing,
+		"Thing",
 		Vector{x: x, y: y},
 	)
-	enemy.name = "Thing"
 	enemy.entityType = typeEnemy
-	enemy.scoreValue = 100
+	enemy.scoreValue = 50
 	enemy.hitBoxes = append(enemy.hitBoxes, Box{5, 2, 15, 20})
+
+	sequences := map[string]*sequence{
+		"idle":    newSequence(SpriteSheetImage, animEnemyThing, animSampleRate, true),
+		"destroy": newSequence(SpriteSheetImage, animEnemyCat, animSampleRate, true),
+	}
+	animator := newAnimator(enemy, sequences, "idle")
+	enemy.addComponent(animator)
+
 	cmover := NewConstantMover(enemy, Vector{x: 0.2, y: 1})
 	enemy.addComponent(cmover)
 	g.enemies = append(g.enemies, enemy)
@@ -49,14 +61,20 @@ func spawnThing(g *Game, x, y float64, speed Vector) {
 
 func spawnFlyingMan1(g *Game, x, y float64, speed Vector) {
 	enemy := newEntity(
-		SpriteSheetImage,
-		animEnemyFlyingMan1,
+		"FlyingMan1",
 		Vector{x: x, y: y},
 	)
-	enemy.name = "FlyingMan1"
 	enemy.entityType = typeEnemy
-	enemy.scoreValue = 200
+	enemy.scoreValue = 100
 	enemy.hitBoxes = append(enemy.hitBoxes, Box{5, 2, 15, 20})
+
+	sequences := map[string]*sequence{
+		"idle":    newSequence(SpriteSheetImage, animEnemyFlyingMan1, animSampleRate, true),
+		"destroy": newSequence(SpriteSheetImage, animEnemyCat, animSampleRate, true),
+	}
+	animator := newAnimator(enemy, sequences, "idle")
+	enemy.addComponent(animator)
+
 	cmover := NewConstantMover(enemy, speed)
 	enemy.addComponent(cmover)
 	cshooter := NewConstantShooter(
@@ -70,22 +88,30 @@ func spawnFlyingMan1(g *Game, x, y float64, speed Vector) {
 
 func spawnCat(g *Game, x, y float64, speed Vector) {
 	enemy := newEntity(
-		SpriteSheetImage,
-		animEnemyCat,
+		"Cat",
 		Vector{x: x, y: y},
 	)
-	enemy.name = "Cat"
 	enemy.entityType = typeEnemy
-	enemy.scoreValue = 300
+	enemy.scoreValue = 200
 	enemy.hitBoxes = append(enemy.hitBoxes, Box{5, 2, 15, 20})
+
+	sequences := map[string]*sequence{
+		"idle":    newSequence(SpriteSheetImage, animEnemyCat, animSampleRate, true),
+		"destroy": newSequence(SpriteSheetImage, animEnemyCat, animSampleRate, true),
+	}
+	animator := newAnimator(enemy, sequences, "idle")
+	enemy.addComponent(animator)
+
 	cmover := NewConstantMover(enemy, speed)
 	enemy.addComponent(cmover)
+
 	cshooter := NewConstantShooter(
 		enemy,
 		time.Millisecond*600,
 		g.enemiesBullettPool,
 	)
 	enemy.addComponent(cshooter)
+
 	g.enemies = append(g.enemies, enemy)
 }
 

@@ -8,10 +8,16 @@ import (
 func initBulletPool(name string, etype entityType, anim []int, bulletPoolSize int, speed Vector, hitbox Box) []*Entity {
 	pool := make([]*Entity, 0)
 	for i := 0; i < bulletPoolSize; i++ {
-		bul := newEntity(SpriteSheetImage, anim, Vector{x: 0, y: 0})
+		bul := newEntity(name+fmt.Sprint(i), Vector{x: 0, y: 0})
 		bul.hitBoxes = append(bul.hitBoxes, hitbox)
-		bul.name = name + fmt.Sprint(i)
 		bul.entityType = etype
+
+		sequences := map[string]*sequence{
+			"idle": newSequence(SpriteSheetImage, anim, animSampleRate, true),
+		}
+		animator := newAnimator(bul, sequences, "idle")
+		bul.addComponent(animator)
+
 		mover := NewConstantMover(bul, speed)
 		bul.addComponent(mover)
 		bul.active = false
