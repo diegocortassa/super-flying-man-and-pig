@@ -42,7 +42,7 @@ const (
 	StateTitle
 	StateGame
 	StateAttract
-	StateHiscore
+	StateHiscores
 	StateInsertName
 	StateGameOver
 	StateGameEnd
@@ -85,12 +85,13 @@ func init() {
 	// initializations before creating the game
 	rand.Seed(time.Now().UnixNano())
 	initAssets()
+	initSounds()
 }
 
 func (g *Game) init() {
 	// initializations before running the game
 	g.state = StateInit
-	g.hiScores = 1420
+	g.hiScores = 1230
 	g.PreviousState = StateInit
 	g.lastStateTransition = time.Now()
 	g.lastEvent = time.Now()
@@ -203,15 +204,15 @@ func (g *Game) Update() error {
 	case StateTitle:
 		g.UpdateTileState()
 	case StateAttract:
-		g.UpdateGameState()
+		g.UpdateAttractState()
 	case StateGame:
 		g.UpdateGameState()
 	case StateGameOver:
 		g.UpdateGameOverState()
 	case StateInsertName:
 		g.UpdateGameState()
-	case StateHiscore:
-		g.UpdateGameState()
+	case StateHiscores:
+		g.UpdateHiscoresState()
 	case StateGameEnd:
 		g.UpdateGameState()
 	}
@@ -225,15 +226,15 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	case StateTitle:
 		g.DrawTitleState(screen)
 	case StateAttract:
-		g.DrawGameState(screen)
+		g.DrawAttractState(screen)
 	case StateGame:
 		g.DrawGameState(screen)
 	case StateGameOver:
 		g.DrawGameOverState(screen)
 	case StateInsertName:
 		g.DrawGameState(screen)
-	case StateHiscore:
-		g.DrawGameState(screen)
+	case StateHiscores:
+		g.DrawHiscoreState(screen)
 	case StateGameEnd:
 		g.DrawGameState(screen)
 	}
@@ -310,6 +311,8 @@ func main() {
 	iconImg, _, _ := image.Decode(bytes.NewReader(iconImage_png))
 	iconImgS := []image.Image{iconImg}
 	ebiten.SetWindowIcon(iconImgS)
+	ebiten.SetCursorMode(ebiten.CursorModeHidden)
+
 	if err := ebiten.RunGame(g); err != nil {
 		log.Fatal(err)
 	}

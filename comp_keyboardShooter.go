@@ -47,6 +47,8 @@ func (ks *keyboardShooter) shoot() {
 		bul.position.y = ks.container.position.y
 		// bul.rotation = 270 * (math.Pi / 180)
 		ks.lastShot = time.Now()
+		audiosfx_wpn_laser1Player.Rewind()
+		audiosfx_wpn_laser1Player.Play()
 	}
 	return
 

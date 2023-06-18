@@ -16,6 +16,14 @@ func DrawTextByCenter(screen *ebiten.Image, msg string, font font.Face, cx, cy i
 	text.Draw(screen, msg, font, x, y, textColor)
 }
 
+// Draws text using it's center point as coordinates and a shadow
+func DrawTextWithShadowByCenter(screen *ebiten.Image, msg string, font font.Face, cx, cy int, textColor color.Color) {
+	bounds := text.BoundString(font, msg)
+	x, y := cx-bounds.Min.X-bounds.Dx()/2, cy-bounds.Min.Y-bounds.Dy()/2
+	text.Draw(screen, msg, arcadeFont, x+1, y+1, color.Black)
+	text.Draw(screen, msg, arcadeFont, x, y, textColor)
+}
+
 // Draws image using it's center point as coordinates
 func DrawImageByCenter(screen *ebiten.Image, image *ebiten.Image, cx, cy int, op *ebiten.DrawImageOptions) {
 	size := image.Bounds().Size()
@@ -43,6 +51,7 @@ func IsP1FireJustPressed() bool {
 	return inpututil.IsKeyJustPressed(ebiten.KeyControlLeft)
 }
 
+// keys abstraction
 func IsP2FireJustPressed() bool {
 	gamepadIDs := ebiten.GamepadIDs()
 	if len(gamepadIDs) >= 2 {

@@ -2,23 +2,21 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"runtime"
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
-	"github.com/hajimehoshi/ebiten/v2/audio"
 )
 
-const STATECOOLDOWN = time.Millisecond * 1000
+const (
+	STATECOOLDOWN       = time.Millisecond * 1000
+	attractRotationTime = 5 // Seconds before rotating attract screens
+)
 
 func (g *Game) UpdateSequencer() {
 
-	// g.mode = ModeTitle
-	// g.mode = ModeGameOver
-
-	var err error
+	// g.state = StateHiscores
 
 	var m runtime.MemStats
 	runtime.ReadMemStats(&m)
@@ -27,10 +25,15 @@ func (g *Game) UpdateSequencer() {
 	DebugPrintf(fmt.Sprintf("\tSys = %v MiB", m.Sys/1024/1024))
 	DebugPrintf(fmt.Sprintf("\tNumGC = %v\n", m.NumGC))
 
-	// Always trasition
+	// if sfx_exp_double3Player != nil {
+	// 	sfx_exp_double3Player.Play()
+	// }
+
+	// In all States
 	if IsExitJustPressed() {
 		os.Exit(0)
 	}
+
 	if IsFullScreenJustPressed() {
 		if ebiten.IsFullscreen() {
 			ebiten.SetFullscreen(false)
@@ -38,79 +41,30 @@ func (g *Game) UpdateSequencer() {
 			ebiten.SetFullscreen(true)
 		}
 	}
+
 	if IsResetJustPressed() {
 		g.reset()
-		g.ChangeState(StateTitle)
+		changed := g.ChangeState(StateTitle)
+		if changed {
+			PlayTheme(audio1StageThemePlayer)
+		}
 	}
 
+	// At first init
 	if g.state == StateInit {
 		changed := g.ChangeState(StateTitle)
 		if changed {
-			soundThemeSource := audio.NewInfiniteLoop(audio1StageTheme, audio1StageTheme.Length()+1)
-			audioPlayer, err = audio.NewPlayer(audioContext, soundThemeSource)
-			if err != nil {
-				log.Fatal(err)
-			}
-			audioPlayer.SetVolume(MUSIC_VOLUME)
-			audioPlayer.Play()
+			PlayTheme(audio1StageThemePlayer)
 		}
 	}
 
-	// State trasitions
-	if g.state == StateTitle {
-		if IsP1FireJustPressed() {
-			g.reset()
-			g.resetPlayerOne()
-			g.resetPlayerTwo()
-			g.playerOne.active = true
-			changed := g.ChangeState(StateGame)
-			if changed {
-				audioPlayer.Close()
-				soundThemeSource := audio.NewInfiniteLoop(audio2StageTheme, audio2StageTheme.Length()+1)
-				audioPlayer, err = audio.NewPlayer(audioContext, soundThemeSource)
-				if err != nil {
-					log.Fatal(err)
-				}
-				audioPlayer.SetVolume(MUSIC_VOLUME)
-				audioPlayer.Play()
-			}
-		}
-	}
-
-	if g.state == StateTitle {
-		if IsP2FireJustPressed() {
-			g.reset()
-			g.resetPlayerOne()
-			g.resetPlayerTwo()
-			g.playerTwo.active = true
-			changed := g.ChangeState(StateGame)
-			if changed {
-				fmt.Println("going to game")
-				audioPlayer.Close()
-				soundThemeSource := audio.NewInfiniteLoop(audio2StageTheme, audio2StageTheme.Length()+1)
-				audioPlayer, err = audio.NewPlayer(audioContext, soundThemeSource)
-				if err != nil {
-					log.Fatal(err)
-				}
-				audioPlayer.SetVolume(MUSIC_VOLUME)
-				audioPlayer.Play()
-			}
-		}
-	}
-
+	// *STATE* Game
 	if g.state == StateGame {
 		if !g.playerOne.active && !g.playerTwo.active {
 			g.reset()
 			changed := g.ChangeState(StateGameOver)
 			if changed {
-				audioPlayer.Close()
-				soundThemeSource := audio.NewInfiniteLoop(audioStageSelectTheme, audioStageSelectTheme.Length()+1)
-				audioPlayer, err = audio.NewPlayer(audioContext, soundThemeSource)
-				if err != nil {
-					log.Fatal(err)
-				}
-				audioPlayer.SetVolume(MUSIC_VOLUME)
-				audioPlayer.Play()
+				PlayTheme(audioStageSelectThemePlayer)
 			}
 		}
 		if !g.playerOne.active && IsP1FireJustPressed() {
@@ -121,26 +75,51 @@ func (g *Game) UpdateSequencer() {
 			g.resetPlayerTwo()
 			g.playerTwo.active = true
 		}
+		return
 	}
 
-	if g.state == StateGameOver {
-		if IsP1FireJustPressed() || IsP2FireJustPressed() {
+	// *STATE* Title
+	if g.state == StateTitle {
+		g.CheckStartPressed()
+		if time.Since(g.lastStateTransition) > time.Second*attractRotationTime {
 			g.reset()
+			g.position = 400
+			_ = g.ChangeState(StateAttract)
+		}
+		return
+	}
+
+	// *STATE* GameOver
+	if g.state == StateGameOver {
+		if IsP1FireJustPressed() || IsP2FireJustPressed() || time.Since(g.lastStateTransition) > time.Second*attractRotationTime {
 			changed := g.ChangeState(StateTitle)
 			if changed {
-				audioPlayer.Close()
-				soundThemeSource := audio.NewInfiniteLoop(audio1StageTheme, audio1StageTheme.Length()+1)
-				audioPlayer, err = audio.NewPlayer(audioContext, soundThemeSource)
-				if err != nil {
-					log.Fatal(err)
-				}
-				audioPlayer.SetVolume(MUSIC_VOLUME)
-				audioPlayer.Play()
+				PlayTheme(audio1StageThemePlayer)
 			}
 		}
+		return
+	}
+
+	// *STATE* Attract
+	if g.state == StateAttract {
+		g.CheckStartPressed()
+		if time.Since(g.lastStateTransition) > time.Second*attractRotationTime {
+			_ = g.ChangeState(StateHiscores)
+		}
+		return
+	}
+
+	// *STATE* Highscores
+	if g.state == StateHiscores {
+		g.CheckStartPressed()
+		if time.Since(g.lastStateTransition) > time.Second*attractRotationTime {
+			_ = g.ChangeState(StateTitle)
+		}
+		return
 	}
 }
 
+// Change game stare
 func (g *Game) ChangeState(newState State) bool {
 	if time.Since(g.lastStateTransition) > STATECOOLDOWN {
 		g.PreviousState = g.state
@@ -149,4 +128,27 @@ func (g *Game) ChangeState(newState State) bool {
 		return true
 	}
 	return false
+}
+
+func (g *Game) CheckStartPressed() {
+	if IsP1FireJustPressed() {
+		g.reset()
+		g.resetPlayerOne()
+		g.resetPlayerTwo()
+		g.playerOne.active = true
+		changed := g.ChangeState(StateGame)
+		if changed {
+			PlayTheme(audio2StageThemePlayer)
+		}
+	}
+	if IsP2FireJustPressed() {
+		g.reset()
+		g.resetPlayerOne()
+		g.resetPlayerTwo()
+		g.playerTwo.active = true
+		changed := g.ChangeState(StateGame)
+		if changed {
+			PlayTheme(audio2StageThemePlayer)
+		}
+	}
 }

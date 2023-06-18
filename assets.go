@@ -5,11 +5,13 @@ import (
 	_ "embed"
 	"image"
 	"image/color"
+	"io"
 	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/audio"
 	"github.com/hajimehoshi/ebiten/v2/audio/mp3"
+	"github.com/hajimehoshi/ebiten/v2/audio/wav"
 	"golang.org/x/image/font"
 	"golang.org/x/image/font/opentype"
 )
@@ -49,28 +51,53 @@ var (
 	arcadeFont     font.Face
 
 	// AUDIO
-	audioContext *audio.Context
-	audioPlayer  *audio.Player
+	audioContext       *audio.Context
+	audioPlayerPlaying *audio.Player // points to currently playing audioplayer
 
 	//go:embed assets/1_Stage.mp3
-	audio1StageTheme_mp3 []byte
-	audio1StageTheme     *mp3.Stream
+	audio1StageTheme_mp3   []byte
+	audio1StageThemePlayer *audio.Player
 
 	//go:embed assets/2_Stage.mp3
-	audio2StageTheme_mp3 []byte
-	audio2StageTheme     *mp3.Stream
+	audio2StageTheme_mp3   []byte
+	audio2StageThemeStream *mp3.Stream
+	audio2StageThemePlayer *audio.Player
 
 	//go:embed assets/3_Boss_Fight.mp3
-	audioBossFightTheme_mp3 []byte
-	audioBossFightTheme     *mp3.Stream
+	audioBossFightTheme_mp3   []byte
+	audioBossFightThemePlayer *audio.Player
 
 	//go:embed assets/4_Stage_Select.mp3
-	audioStageSelectTheme_mp3 []byte
-	audioStageSelectTheme     *mp3.Stream
+	audioStageSelectTheme_mp3   []byte
+	audioStageSelectThemePlayer *audio.Player
+
+	// P1 fire
+	//go:embed assets/sfx_wpn_laser1.wav
+	audiosfx_wpn_laser1_wav   []byte
+	audiosfx_wpn_laser1Player *audio.Player
+
+	// P1 Die
+	//go:embed assets/sfx_exp_odd3.wav
+	audiosfx_exp_odd3_wav   []byte
+	audiosfx_exp_odd3Player *audio.Player
+
+	// P2 Fire
+	// P2 Die
+	// Enemy Fire
+	// Explosion
+	//go:embed assets/sfx_exp_odd1.wav
+	audiosfx_exp_odd1_wav   []byte
+	audiosfx_exp_odd1Player *audio.Player
+
+	// EnemyBaloon Die
+	//go:embed assets/sfx_exp_double3.wav
+	sfx_exp_double3_wav   []byte
+	sfx_exp_double3Player *audio.Player
 )
 
 // colors
 var ColorYellow color.RGBA
+var ColorRed color.RGBA
 
 // sprite animations
 var (
@@ -91,25 +118,6 @@ var (
 )
 
 func initAssets() {
-	// AUDIO
-	audioContext = audio.NewContext(44100)
-	var err error
-	audio1StageTheme, err = mp3.DecodeWithoutResampling(bytes.NewReader(audio1StageTheme_mp3))
-	if err != nil {
-		log.Fatal(err)
-	}
-	audio2StageTheme, err = mp3.DecodeWithoutResampling(bytes.NewReader(audio2StageTheme_mp3))
-	if err != nil {
-		log.Fatal(err)
-	}
-	audioBossFightTheme, err = mp3.DecodeWithoutResampling(bytes.NewReader(audioBossFightTheme_mp3))
-	if err != nil {
-		log.Fatal(err)
-	}
-	audioStageSelectTheme, err = mp3.DecodeWithoutResampling(bytes.NewReader(audioStageSelectTheme_mp3))
-	if err != nil {
-		log.Fatal(err)
-	}
 
 	tt, err := opentype.Parse(arcadeFont_ttf)
 	if err != nil {
@@ -155,6 +163,89 @@ func initAssets() {
 
 	// Colors
 	ColorYellow = color.RGBA{0xf6, 0xf4, 0x0d, 0xff}
+	ColorRed = color.RGBA{0xf6, 0x00, 0x00, 0xff}
+}
+
+func initSounds() {
+	// AUDIO
+	audioContext = audio.NewContext(44100)
+
+	audio1StageThemePlayer = LoadMp3Sound(audio1StageTheme_mp3, true)
+	audio1StageThemePlayer.SetVolume(MUSIC_VOLUME)
+
+	audio2StageThemePlayer = LoadMp3Sound(audio2StageTheme_mp3, true)
+	audio2StageThemePlayer.SetVolume(MUSIC_VOLUME)
+
+	audioBossFightThemePlayer = LoadMp3Sound(audioBossFightTheme_mp3, true)
+	audioBossFightThemePlayer.SetVolume(MUSIC_VOLUME)
+
+	audioStageSelectThemePlayer = LoadMp3Sound(audioStageSelectTheme_mp3, true)
+	audioStageSelectThemePlayer.SetVolume(MUSIC_VOLUME)
+
+	audiosfx_wpn_laser1Player = LoadWavSound(audiosfx_wpn_laser1_wav, false)
+	audiosfx_wpn_laser1Player.SetVolume(MUSIC_VOLUME)
+
+	audiosfx_exp_odd3Player = LoadWavSound(audiosfx_exp_odd3_wav, false)
+	audiosfx_exp_odd3Player.SetVolume(MUSIC_VOLUME)
+
+	audiosfx_exp_odd1Player = LoadWavSound(audiosfx_exp_odd1_wav, false)
+	audiosfx_exp_odd1Player.SetVolume(MUSIC_VOLUME)
+
+	sfx_exp_double3Player = LoadWavSound(sfx_exp_double3_wav, false)
+	audiosfx_exp_odd1Player.SetVolume(MUSIC_VOLUME)
+}
+
+func LoadMp3Sound(contents []byte, loop bool) *audio.Player {
+	stream, err := mp3.DecodeWithoutResampling(bytes.NewReader(contents))
+	if err != nil {
+		log.Fatal(err)
+	}
+	var audioSource io.Reader
+	if loop {
+		audioSource = audio.NewInfiniteLoop(stream, stream.Length()+1)
+	} else {
+		audioSource = stream
+	}
+	player, err := audio.NewPlayer(audioContext, audioSource)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Workaround to prevent delays when playing for the first time.
+	// player.SetVolume(0)
+	// player.Play()
+	// player.Pause()
+	// player.Rewind()
+	// player.SetVolume(1)
+
+	return player
+}
+
+func LoadWavSound(contents []byte, loop bool) *audio.Player {
+	stream, err := wav.DecodeWithoutResampling(bytes.NewReader(contents))
+	if err != nil {
+		log.Fatal(err)
+	}
+	var audioSource io.Reader
+	if loop {
+		audioSource = audio.NewInfiniteLoop(stream, stream.Length()+1)
+	} else {
+		audioSource = stream
+	}
+	player, err := audio.NewPlayer(audioContext, audioSource)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return player
+}
+
+func PlayTheme(newPlayer *audio.Player) {
+	if audioPlayerPlaying != nil {
+		audioPlayerPlaying.Pause()
+		audioPlayerPlaying.Rewind()
+	}
+	audioPlayerPlaying = newPlayer
+	audioPlayerPlaying.Play()
 }
 
 func getSprite(frameIndex int) image.Image {

@@ -31,10 +31,12 @@ func newAnimator(container *Entity, sequences map[string]*sequence, defaultSeque
 func (an *animator) Update() {
 	sequence := an.sequences[an.currentSeq]
 
-	// Collision logis should not be here
+	// TODO Collision logic should not be here !!
 	if an.container.hit && an.currentSeq == "idle" {
 		an.sequences["destroy"].currentFrame = 0
 		an.currentSeq = "destroy"
+		audiosfx_exp_odd1Player.Rewind()
+		audiosfx_exp_odd1Player.Play()
 	}
 	if an.container.hit && an.finished {
 		an.container.hit = false
