@@ -105,7 +105,7 @@ func (g *Game) reset() {
 	// Enemies
 	g.enemies = nil
 	// Enemies Bullets
-	g.enemiesBullettPool = initBulletPool("EnemyBullet", typeEnemyBullet, animEnemyPew, 10, Vector{0, 0}, Box{8, 8, 8, 8})
+	g.enemiesBullettPool = initBulletPool("EnemyBullet", typeEnemyBullet, animEnemyBullet1, 20, 10, Vector{0, 0}, Box{9, 9, 6, 6})
 }
 
 func (g *Game) resetPlayerOne() {
@@ -115,7 +115,7 @@ func (g *Game) resetPlayerOne() {
 		Vector{x: (screenWidth - spriteSize) / 4, y: screenHeight - spriteSize - 20},
 	)
 	g.playerOne.active = false
-	g.playerOne.hitBoxes = append(g.playerOne.hitBoxes, Box{5, 2, 15, 20})
+	g.playerOne.hitBoxes = append(g.playerOne.hitBoxes, Box{6, 3, 12, 17})
 
 	sequences := map[string]*sequence{
 		"idle":    newSequence(animSuperFlyingMan, ANIM_FPS, true),
@@ -139,7 +139,7 @@ func (g *Game) resetPlayerOne() {
 	)
 	g.playerOne.addComponent(mover)
 
-	g.playerOneBullettPool = initBulletPool("P1Bullet", typePlayerOneBullet, animSuperFlyingManPew, 5, Vector{0, -4}, Box{8, 2, 8, 8})
+	g.playerOneBullettPool = initBulletPool("P1Bullet", typePlayerOneBullet, animSuperFlyingManPew, ANIM_FPS, 5, Vector{0, -4}, Box{8, 2, 8, 8})
 	shooter := NewKeyboardShooter(
 		g.playerOne,
 		ebiten.KeyControlLeft,
@@ -159,7 +159,7 @@ func (g *Game) resetPlayerTwo() {
 		Vector{x: (screenWidth - spriteSize) / 4 * 3, y: screenHeight - spriteSize - 20},
 	)
 	g.playerTwo.active = false
-	g.playerTwo.hitBoxes = append(g.playerTwo.hitBoxes, Box{5, 2, 15, 20})
+	g.playerTwo.hitBoxes = append(g.playerTwo.hitBoxes, Box{5, 3, 12, 17})
 
 	sequences := map[string]*sequence{
 		"idle":    newSequence(animPig, ANIM_FPS, true),
@@ -183,7 +183,7 @@ func (g *Game) resetPlayerTwo() {
 	)
 	g.playerTwo.addComponent(mover)
 
-	g.playerTwoBullettPool = initBulletPool("P2Bullet", typePlayerTwoBullet, animPigPew, 5, Vector{0, -4}, Box{8, 2, 8, 8})
+	g.playerTwoBullettPool = initBulletPool("P2Bullet", typePlayerTwoBullet, animPigPew, ANIM_FPS, 5, Vector{0, -4}, Box{8, 2, 8, 8})
 	shooter := NewKeyboardShooter(
 		g.playerTwo,
 		ebiten.KeyQ,

@@ -107,14 +107,17 @@ var (
 	animPig               = []int{10, 11, 12, 13, 13, 12, 11, 10}                                         // Pig
 	animSuperFlyingManDie = []int{17, 18, 19, 19, 20, 20, 21, 21, 22, 23, 24, 24, 25, 25, 25, 25}         // SuperFlyingManDie
 	animPigDie            = []int{26, 27, 28, 28, 29, 29, 30, 30, 31, 31, 22, 23, 24, 24, 25, 25, 25, 25} // PigDie
-	animEnemyPew          = []int{46, 47}                                                                 // EnemyPew
-	animEnemyBaloon       = []int{32, 33, 34, 35, 36, 36, 35, 34, 33, 32}                                 // EnemyBaloon
-	animEnemyBaloonFPS    = 5.0
-	animEnemyBaloonDie    = []int{37, 38, 38, 39, 39, 40, 40, 46, 47, 48, 49, 49} // EnemyBaloonDie
-	animExplosion         = []int{46, 47, 48, 49, 48, 47, 46}                     // Explosion
-	animEnemyFlyingMan1   = []int{41, 42, 43, 44, 45, 45, 43, 42}                 // EnemyFlyingMan1
-	animEnemyThing        = []int{50, 51, 52, 53, 52, 51, 50}                     // EnemyThing
-	animEnemyCat          = []int{54, 55, 56, 57, 56, 55, 54}                     // EnemyCat
+	// animEnemyBullet          = []int{46, 47}                                                                 // animEnemyBullet
+	animEnemyBullet1    = []int{58, 59, 60, 61, 62, 63}                 // EnemyBullet1
+	animEnemyBullet2    = []int{64, 65}                                 // EnemyBullet2
+	animEnemyBaloon     = []int{32, 33, 34, 35, 36, 36, 35, 34, 33, 32} // EnemyBaloon
+	animEnemyBaloonFPS  = 5.0
+	animEnemyBaloonDie  = []int{37, 38, 38, 39, 39, 40, 40, 46, 47, 48, 49, 49} // EnemyBaloonDie
+	animExplosion       = []int{46, 47, 48, 49, 48, 47, 46}                     // Explosion
+	animEnemyFlyingMan1 = []int{41, 42, 43, 44, 45, 45, 43, 42}                 // EnemyFlyingMan1
+	animEnemyThing      = []int{50, 51, 52, 53, 52, 51, 50}                     // EnemyThing
+	animEnemyCat        = []int{54, 55, 56, 57, 56, 55, 54}                     // EnemyCat
+
 )
 
 func initAssets() {

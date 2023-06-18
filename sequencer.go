@@ -91,7 +91,7 @@ func (g *Game) UpdateSequencer() {
 
 	// *STATE* GameOver
 	if g.state == StateGameOver {
-		if IsP1FireJustPressed() || IsP2FireJustPressed() || time.Since(g.lastStateTransition) > time.Second*attractRotationTime {
+		if IsP1FireJustPressed() || IsP2FireJustPressed() || time.Since(g.lastStateTransition) > time.Second*10 {
 			changed := g.ChangeState(StateTitle)
 			if changed {
 				PlayTheme(audio1StageThemePlayer)

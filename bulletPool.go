@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-func initBulletPool(name string, etype entityType, anim []int, bulletPoolSize int, speed Vector, hitbox Box) []*Entity {
+func initBulletPool(name string, etype entityType, anim []int, animFPS float64, bulletPoolSize int, speed Vector, hitbox Box) []*Entity {
 	pool := make([]*Entity, 0)
 	for i := 0; i < bulletPoolSize; i++ {
 		bul := newEntity(name+fmt.Sprint(i), Vector{x: 0, y: 0})
@@ -13,7 +13,7 @@ func initBulletPool(name string, etype entityType, anim []int, bulletPoolSize in
 		bul.entityType = etype
 
 		sequences := map[string]*sequence{
-			"idle": newSequence(anim, ANIM_FPS, true),
+			"idle": newSequence(anim, animFPS, true),
 		}
 		animator := newAnimator(bul, sequences, "idle")
 		bul.addComponent(animator)
