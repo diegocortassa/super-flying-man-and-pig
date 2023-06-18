@@ -23,12 +23,9 @@ func NewKeyboardMover(container *Entity, Keybinds Keybinds, speed Vector) *KeyBo
 }
 
 func (k *KeyBoardMover) Update() {
-	if !k.active {
+	if !k.container.active || k.container.hit {
 		return
 	}
-	// if ebiten.IsKeyPressed(k.Keybinds.fire) && time.Since(k.container.lastShoot) >= k.container.shotCoolDown {
-	// 	k.container.Shoot(g)
-	// }
 	if ebiten.IsKeyPressed(k.Keybinds.Up) && k.container.position.y > 0 {
 		k.container.position.y -= k.speed.y
 	}

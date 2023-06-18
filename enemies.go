@@ -27,8 +27,8 @@ func spawnBaloon(g *Game, x, y float64, speed Vector) {
 	enemy.hitBoxes = append(enemy.hitBoxes, Box{5, 2, 15, 20})
 
 	sequences := map[string]*sequence{
-		"idle":    newSequence(SpriteSheetImage, animEnemyBaloon, animSampleRate, true),
-		"destroy": newSequence(SpriteSheetImage, animEnemyCat, animSampleRate, true),
+		"idle":    newSequence(animEnemyBaloon, animEnemyBaloonFPS, true),
+		"destroy": newSequence(animEnemyBaloonDie, ANIM_FPS, false),
 	}
 	animator := newAnimator(enemy, sequences, "idle")
 	enemy.addComponent(animator)
@@ -48,8 +48,8 @@ func spawnThing(g *Game, x, y float64, speed Vector) {
 	enemy.hitBoxes = append(enemy.hitBoxes, Box{5, 2, 15, 20})
 
 	sequences := map[string]*sequence{
-		"idle":    newSequence(SpriteSheetImage, animEnemyThing, animSampleRate, true),
-		"destroy": newSequence(SpriteSheetImage, animEnemyCat, animSampleRate, true),
+		"idle":    newSequence(animEnemyThing, ANIM_FPS, true),
+		"destroy": newSequence(animExplosion, ANIM_FPS, false),
 	}
 	animator := newAnimator(enemy, sequences, "idle")
 	enemy.addComponent(animator)
@@ -69,8 +69,8 @@ func spawnFlyingMan1(g *Game, x, y float64, speed Vector) {
 	enemy.hitBoxes = append(enemy.hitBoxes, Box{5, 2, 15, 20})
 
 	sequences := map[string]*sequence{
-		"idle":    newSequence(SpriteSheetImage, animEnemyFlyingMan1, animSampleRate, true),
-		"destroy": newSequence(SpriteSheetImage, animEnemyCat, animSampleRate, true),
+		"idle":    newSequence(animEnemyFlyingMan1, ANIM_FPS, true),
+		"destroy": newSequence(animSuperFlyingManDie, ANIM_FPS, false),
 	}
 	animator := newAnimator(enemy, sequences, "idle")
 	enemy.addComponent(animator)
@@ -96,8 +96,8 @@ func spawnCat(g *Game, x, y float64, speed Vector) {
 	enemy.hitBoxes = append(enemy.hitBoxes, Box{5, 2, 15, 20})
 
 	sequences := map[string]*sequence{
-		"idle":    newSequence(SpriteSheetImage, animEnemyCat, animSampleRate, true),
-		"destroy": newSequence(SpriteSheetImage, animEnemyCat, animSampleRate, true),
+		"idle":    newSequence(animEnemyCat, ANIM_FPS, true),
+		"destroy": newSequence(animExplosion, ANIM_FPS, false),
 	}
 	animator := newAnimator(enemy, sequences, "idle")
 	enemy.addComponent(animator)

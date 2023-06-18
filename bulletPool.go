@@ -13,7 +13,7 @@ func initBulletPool(name string, etype entityType, anim []int, bulletPoolSize in
 		bul.entityType = etype
 
 		sequences := map[string]*sequence{
-			"idle": newSequence(SpriteSheetImage, anim, animSampleRate, true),
+			"idle": newSequence(anim, ANIM_FPS, true),
 		}
 		animator := newAnimator(bul, sequences, "idle")
 		bul.addComponent(animator)

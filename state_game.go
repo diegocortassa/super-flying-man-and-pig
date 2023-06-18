@@ -118,7 +118,7 @@ func (g *Game) DrawGameState(screen *ebiten.Image) {
 
 	// Draw Score/Lives
 	var msg string
-	textColor := color.RGBA{0xf6, 0xf4, 0x0d, 0xff}
+
 	if g.playerOne.active {
 		msg = fmt.Sprintf("1UP %d\n%05d", g.playerOne.lives, g.playerOne.scores)
 	} else {
@@ -129,11 +129,11 @@ func (g *Game) DrawGameState(screen *ebiten.Image) {
 		}
 	}
 	text.Draw(screen, msg, arcadeFont, 6, 21, color.Black)
-	text.Draw(screen, msg, arcadeFont, 5, 20, textColor)
+	text.Draw(screen, msg, arcadeFont, 5, 20, ColorYellow)
 
 	msg = fmt.Sprintf("HI-SCORE\n  %05d", g.hiScores)
 	text.Draw(screen, msg, arcadeFont, 91, 21, color.Black)
-	text.Draw(screen, msg, arcadeFont, 90, 20, textColor)
+	text.Draw(screen, msg, arcadeFont, 90, 20, ColorYellow)
 
 	if g.playerTwo.active {
 		msg = fmt.Sprintf("2UP %d\n%05d", g.playerTwo.lives, g.playerTwo.scores)
@@ -145,13 +145,14 @@ func (g *Game) DrawGameState(screen *ebiten.Image) {
 		}
 	}
 	text.Draw(screen, msg, arcadeFont, 171, 21, color.Black)
-	text.Draw(screen, msg, arcadeFont, 170, 20, textColor)
+	text.Draw(screen, msg, arcadeFont, 170, 20, ColorYellow)
 
 	// Draw debug data
 	if debug {
-		newLines := "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n"
-		ebitenutil.DebugPrint(screen,
-			fmt.Sprintf("%vTPS: %0.2f FPS: %0.2f \n Pos:%v TEnt: %v AEnt: %v Blt: %v", newLines,
-				ebiten.ActualTPS(), ebiten.ActualFPS(), g.position, totalEntities, activeEntities, activeBuls))
+		ebitenutil.DebugPrintAt(screen,
+			fmt.Sprintf("TPS: %0.2f FPS: %0.2f \nPos:%v TEnt: %v AEnt: %v Blt: %v",
+				ebiten.ActualTPS(), ebiten.ActualFPS(), g.position, totalEntities, activeEntities, activeBuls),
+			2, screenHeight-30)
+
 	}
 }

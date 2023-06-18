@@ -117,8 +117,8 @@ func (g *Game) resetPlayerOne() {
 	g.playerOne.hitBoxes = append(g.playerOne.hitBoxes, Box{5, 2, 15, 20})
 
 	sequences := map[string]*sequence{
-		"idle":    newSequence(SpriteSheetImage, animSuperFlyingMan, animSampleRate, true),
-		"destroy": newSequence(SpriteSheetImage, animSuperFlyingManDie, animSampleRate, true),
+		"idle":    newSequence(animSuperFlyingMan, ANIM_FPS, true),
+		"destroy": newSequence(animSuperFlyingManDie, ANIM_FPS, false),
 	}
 	animator := newAnimator(g.playerOne, sequences, "idle")
 	g.playerOne.addComponent(animator)
@@ -146,6 +146,9 @@ func (g *Game) resetPlayerOne() {
 		time.Millisecond*250,
 	)
 	g.playerOne.addComponent(shooter)
+
+	gpMover := NewGamePadMover(g.playerOne, 0, Vector{1, 1}, g.playerOneBullettPool, time.Millisecond*250)
+	g.playerOne.addComponent(gpMover)
 }
 
 func (g *Game) resetPlayerTwo() {
@@ -158,8 +161,8 @@ func (g *Game) resetPlayerTwo() {
 	g.playerTwo.hitBoxes = append(g.playerTwo.hitBoxes, Box{5, 2, 15, 20})
 
 	sequences := map[string]*sequence{
-		"idle":    newSequence(SpriteSheetImage, animPig, animSampleRate, true),
-		"destroy": newSequence(SpriteSheetImage, animPigDie, animSampleRate, true),
+		"idle":    newSequence(animPig, ANIM_FPS, true),
+		"destroy": newSequence(animPigDie, ANIM_FPS, false),
 	}
 	animator := newAnimator(g.playerTwo, sequences, "idle")
 	g.playerTwo.addComponent(animator)
@@ -187,6 +190,9 @@ func (g *Game) resetPlayerTwo() {
 		time.Millisecond*250,
 	)
 	g.playerTwo.addComponent(shooter)
+
+	gpMover := NewGamePadMover(g.playerTwo, 1, Vector{1, 1}, g.playerTwoBullettPool, time.Millisecond*250)
+	g.playerTwo.addComponent(gpMover)
 }
 
 func (g *Game) Update() error {

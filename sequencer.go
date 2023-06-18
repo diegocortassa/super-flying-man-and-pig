@@ -9,7 +9,6 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/audio"
-	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
 const STATECOOLDOWN = time.Millisecond * 1000
@@ -29,18 +28,17 @@ func (g *Game) UpdateSequencer() {
 	DebugPrintf(fmt.Sprintf("\tNumGC = %v\n", m.NumGC))
 
 	// Always trasition
-	if inpututil.IsKeyJustPressed(ebiten.KeyEscape) {
-		log.Println("Bye")
+	if IsExitJustPressed() {
 		os.Exit(0)
 	}
-	if inpututil.IsKeyJustPressed(ebiten.KeyF) {
+	if IsFullScreenJustPressed() {
 		if ebiten.IsFullscreen() {
 			ebiten.SetFullscreen(false)
 		} else {
 			ebiten.SetFullscreen(true)
 		}
 	}
-	if inpututil.IsKeyJustPressed(ebiten.KeyR) {
+	if IsResetJustPressed() {
 		g.reset()
 		g.ChangeState(StateTitle)
 	}
@@ -53,14 +51,14 @@ func (g *Game) UpdateSequencer() {
 			if err != nil {
 				log.Fatal(err)
 			}
-			audioPlayer.SetVolume(0.05)
+			audioPlayer.SetVolume(MUSIC_VOLUME)
 			audioPlayer.Play()
 		}
 	}
 
 	// State trasitions
 	if g.state == StateTitle {
-		if inpututil.IsKeyJustPressed(ebiten.KeyControlLeft) {
+		if IsP1FireJustPressed() {
 			g.reset()
 			g.resetPlayerOne()
 			g.resetPlayerTwo()
@@ -73,14 +71,14 @@ func (g *Game) UpdateSequencer() {
 				if err != nil {
 					log.Fatal(err)
 				}
-				audioPlayer.SetVolume(0.05)
+				audioPlayer.SetVolume(MUSIC_VOLUME)
 				audioPlayer.Play()
 			}
 		}
 	}
 
 	if g.state == StateTitle {
-		if inpututil.IsKeyJustPressed(ebiten.KeyQ) {
+		if IsP2FireJustPressed() {
 			g.reset()
 			g.resetPlayerOne()
 			g.resetPlayerTwo()
@@ -94,7 +92,7 @@ func (g *Game) UpdateSequencer() {
 				if err != nil {
 					log.Fatal(err)
 				}
-				audioPlayer.SetVolume(0.05)
+				audioPlayer.SetVolume(MUSIC_VOLUME)
 				audioPlayer.Play()
 			}
 		}
@@ -111,22 +109,22 @@ func (g *Game) UpdateSequencer() {
 				if err != nil {
 					log.Fatal(err)
 				}
-				audioPlayer.SetVolume(0.05)
+				audioPlayer.SetVolume(MUSIC_VOLUME)
 				audioPlayer.Play()
 			}
 		}
-		if !g.playerOne.active && inpututil.IsKeyJustPressed(ebiten.KeyControlLeft) {
+		if !g.playerOne.active && IsP1FireJustPressed() {
 			g.resetPlayerOne()
 			g.playerOne.active = true
 		}
-		if !g.playerTwo.active && inpututil.IsKeyJustPressed(ebiten.KeyQ) {
+		if !g.playerTwo.active && IsP2FireJustPressed() {
 			g.resetPlayerTwo()
 			g.playerTwo.active = true
 		}
 	}
 
 	if g.state == StateGameOver {
-		if inpututil.IsKeyJustPressed(ebiten.KeyControlLeft) || inpututil.IsKeyJustPressed(ebiten.KeyQ) {
+		if IsP1FireJustPressed() || IsP2FireJustPressed() {
 			g.reset()
 			changed := g.ChangeState(StateTitle)
 			if changed {
@@ -136,7 +134,7 @@ func (g *Game) UpdateSequencer() {
 				if err != nil {
 					log.Fatal(err)
 				}
-				audioPlayer.SetVolume(0.05)
+				audioPlayer.SetVolume(MUSIC_VOLUME)
 				audioPlayer.Play()
 			}
 		}

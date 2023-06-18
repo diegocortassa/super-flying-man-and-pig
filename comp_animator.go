@@ -1,7 +1,6 @@
 package main
 
 import (
-	"image"
 	"image/color"
 	"time"
 
@@ -12,9 +11,10 @@ import (
 type animator struct {
 	container       *Entity
 	sequences       map[string]*sequence
-	current         string
+	currentSeq      string
 	lastFrameChange time.Time
 	finished        bool
+	// mu              sync.Mutex
 }
 
 func newAnimator(container *Entity, sequences map[string]*sequence, defaultSequence string) *animator {
@@ -22,16 +22,31 @@ func newAnimator(container *Entity, sequences map[string]*sequence, defaultSeque
 
 	an.container = container
 	an.sequences = sequences
-	an.current = defaultSequence
+	an.currentSeq = defaultSequence
 	an.lastFrameChange = time.Now()
 
 	return &an
 }
 
 func (an *animator) Update() {
-	sequence := an.sequences[an.current]
+	sequence := an.sequences[an.currentSeq]
 
-	frameInterval := float64(time.Second) / sequence.sampleRate
+	// Collision logis should not be here
+	if an.container.hit && an.currentSeq == "idle" {
+		an.sequences["destroy"].currentFrame = 0
+		an.currentSeq = "destroy"
+	}
+	if an.container.hit && an.finished {
+		an.container.hit = false
+		an.container.invulnerable = false
+		an.currentSeq = "idle"
+		if an.container.lives < 1 {
+			an.container.active = false
+		}
+
+	}
+
+	frameInterval := float64(time.Second) / sequence.fps
 
 	if time.Since(an.lastFrameChange) >= time.Duration(frameInterval) {
 		an.finished = sequence.nextFrame()
@@ -41,10 +56,10 @@ func (an *animator) Update() {
 
 func (an *animator) Draw(screen *ebiten.Image) {
 
-	frameOffset := an.sequences[an.current].frames[an.sequences[an.current].frame] * spriteSize
+	frameIndex := an.sequences[an.currentSeq].frames[an.sequences[an.currentSeq].currentFrame]
 	opts := &ebiten.DrawImageOptions{}
 	opts.GeoM.Translate(an.container.position.x, an.container.position.y)
-	screen.DrawImage(an.sequences[an.current].spriteSheet.SubImage(image.Rect(frameOffset, 0, frameOffset+spriteSize, spriteSize)).(*ebiten.Image), opts)
+	screen.DrawImage(getSprite(frameIndex).(*ebiten.Image), opts)
 
 	if debug {
 		for _, b := range an.container.hitBoxes {
@@ -54,34 +69,37 @@ func (an *animator) Draw(screen *ebiten.Image) {
 
 }
 
-type sequence struct {
-	spriteSheet *ebiten.Image
-	frames      []int
-	frame       int
-	sampleRate  float64
-	loop        bool
+func (an *animator) setSequence(name string) {
+	an.currentSeq = name
+	an.lastFrameChange = time.Now()
 }
 
-func newSequence(spriteSheet *ebiten.Image, frames []int, sampleRate float64, loop bool) *sequence {
+type sequence struct {
+	frames       []int
+	currentFrame int
+	fps          float64
+	loop         bool
+}
+
+func newSequence(frames []int, fps float64, loop bool) *sequence {
 
 	var seq sequence
-	seq.spriteSheet = spriteSheet
 	seq.frames = frames
-	seq.sampleRate = sampleRate
+	seq.fps = fps
 	seq.loop = loop
 
 	return &seq
 }
 
 func (seq *sequence) nextFrame() bool {
-	if seq.frame == len(seq.frames)-1 {
+	if seq.currentFrame == len(seq.frames)-1 {
 		if seq.loop {
-			seq.frame = 0
+			seq.currentFrame = 0
 		} else {
 			return true
 		}
 	} else {
-		seq.frame++
+		seq.currentFrame++
 	}
 	return false
 }

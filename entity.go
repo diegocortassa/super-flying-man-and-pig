@@ -27,23 +27,27 @@ const (
 )
 
 type Entity struct {
-	name       string
-	active     bool
-	position   Vector
-	rotation   float64
-	lives      int
-	scores     int
-	scoreValue int
-	hitBoxes   []Box
-	components []Component
-	parent     *Entity
-	entityType entityType
+	name         string
+	active       bool
+	position     Vector
+	rotation     float64
+	lives        int
+	scores       int
+	scoreValue   int
+	hitBoxes     []Box
+	components   []Component
+	parent       *Entity
+	entityType   entityType
+	hit          bool
+	exploding    bool
+	invulnerable bool
 }
 
 func newEntity(name string, position Vector) *Entity {
 	return &Entity{
 		name:     name,
 		active:   true,
+		lives:    0,
 		position: Vector{x: position.x, y: position.y},
 	}
 }
