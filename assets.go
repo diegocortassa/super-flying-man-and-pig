@@ -55,39 +55,44 @@ var (
 	audioPlayerPlaying *audio.Player // points to currently playing audioplayer
 
 	//go:embed assets/1_Stage.mp3
-	audio1StageTheme_mp3   []byte
-	audio1StageThemePlayer *audio.Player
+	Theme1Stage_mp3   []byte
+	Theme1StagePlayer *audio.Player
 
 	//go:embed assets/2_Stage.mp3
-	audio2StageTheme_mp3   []byte
-	audio2StageThemeStream *mp3.Stream
-	audio2StageThemePlayer *audio.Player
+	Theme2Stage_mp3   []byte
+	Theme2StageStream *mp3.Stream
+	Theme2StagePlayer *audio.Player
 
 	//go:embed assets/3_Boss_Fight.mp3
-	audioBossFightTheme_mp3   []byte
-	audioBossFightThemePlayer *audio.Player
+	ThemeBossFight_mp3   []byte
+	ThemeBossFightPlayer *audio.Player
 
 	//go:embed assets/4_Stage_Select.mp3
-	audioStageSelectTheme_mp3   []byte
-	audioStageSelectThemePlayer *audio.Player
+	ThemeStageSelect_mp3   []byte
+	ThemeStageSelectPlayer *audio.Player
 
 	// P1 fire
 	//go:embed assets/sfx_wpn_laser1.wav
-	audiosfx_wpn_laser1_wav   []byte
-	audiosfx_wpn_laser1Player *audio.Player
+	sfx_wpn_laser1_wav   []byte
+	sfx_wpn_laser1Player *audio.Player
 
 	// P1 Die
 	//go:embed assets/sfx_exp_odd3.wav
-	audiosfx_exp_odd3_wav   []byte
-	audiosfx_exp_odd3Player *audio.Player
+	sfx_exp_odd3_wav   []byte
+	sfx_exp_odd3Player *audio.Player
 
 	// P2 Fire
 	// P2 Die
+
 	// Enemy Fire
+	//go:embed assets/sfx_wpn_laser8.wav
+	sfx_wpn_laser8_wav   []byte
+	sfx_wpn_laser8Player *audio.Player
+
 	// Explosion
 	//go:embed assets/sfx_exp_odd1.wav
-	audiosfx_exp_odd1_wav   []byte
-	audiosfx_exp_odd1Player *audio.Player
+	sfx_exp_odd1_wav   []byte
+	sfx_exp_odd1Player *audio.Player
 
 	// EnemyBaloon Die
 	//go:embed assets/sfx_exp_double3.wav
@@ -173,29 +178,32 @@ func initSounds() {
 	// AUDIO
 	audioContext = audio.NewContext(44100)
 
-	audio1StageThemePlayer = LoadMp3Sound(audio1StageTheme_mp3, true)
-	audio1StageThemePlayer.SetVolume(MUSIC_VOLUME)
+	Theme1StagePlayer = LoadMp3Sound(Theme1Stage_mp3, true)
+	Theme1StagePlayer.SetVolume(MUSIC_VOLUME)
 
-	audio2StageThemePlayer = LoadMp3Sound(audio2StageTheme_mp3, true)
-	audio2StageThemePlayer.SetVolume(MUSIC_VOLUME)
+	Theme2StagePlayer = LoadMp3Sound(Theme2Stage_mp3, true)
+	Theme2StagePlayer.SetVolume(MUSIC_VOLUME)
 
-	audioBossFightThemePlayer = LoadMp3Sound(audioBossFightTheme_mp3, true)
-	audioBossFightThemePlayer.SetVolume(MUSIC_VOLUME)
+	ThemeBossFightPlayer = LoadMp3Sound(ThemeBossFight_mp3, true)
+	ThemeBossFightPlayer.SetVolume(MUSIC_VOLUME)
 
-	audioStageSelectThemePlayer = LoadMp3Sound(audioStageSelectTheme_mp3, true)
-	audioStageSelectThemePlayer.SetVolume(MUSIC_VOLUME)
+	ThemeStageSelectPlayer = LoadMp3Sound(ThemeStageSelect_mp3, true)
+	ThemeStageSelectPlayer.SetVolume(MUSIC_VOLUME)
 
-	audiosfx_wpn_laser1Player = LoadWavSound(audiosfx_wpn_laser1_wav, false)
-	audiosfx_wpn_laser1Player.SetVolume(MUSIC_VOLUME)
+	sfx_wpn_laser1Player = LoadWavSound(sfx_wpn_laser1_wav, false)
+	sfx_wpn_laser1Player.SetVolume(MUSIC_VOLUME)
 
-	audiosfx_exp_odd3Player = LoadWavSound(audiosfx_exp_odd3_wav, false)
-	audiosfx_exp_odd3Player.SetVolume(MUSIC_VOLUME)
+	sfx_exp_odd3Player = LoadWavSound(sfx_exp_odd3_wav, false)
+	sfx_exp_odd3Player.SetVolume(MUSIC_VOLUME)
 
-	audiosfx_exp_odd1Player = LoadWavSound(audiosfx_exp_odd1_wav, false)
-	audiosfx_exp_odd1Player.SetVolume(MUSIC_VOLUME)
+	sfx_exp_odd1Player = LoadWavSound(sfx_exp_odd1_wav, false)
+	sfx_exp_odd1Player.SetVolume(MUSIC_VOLUME)
 
 	sfx_exp_double3Player = LoadWavSound(sfx_exp_double3_wav, false)
-	audiosfx_exp_odd1Player.SetVolume(MUSIC_VOLUME)
+	sfx_exp_odd1Player.SetVolume(MUSIC_VOLUME)
+
+	sfx_wpn_laser8Player = LoadWavSound(sfx_wpn_laser8_wav, false)
+	sfx_wpn_laser8Player.SetVolume(MUSIC_VOLUME)
 }
 
 func LoadMp3Sound(contents []byte, loop bool) *audio.Player {

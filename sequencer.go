@@ -46,7 +46,7 @@ func (g *Game) UpdateSequencer() {
 		g.reset()
 		changed := g.ChangeState(StateTitle)
 		if changed {
-			PlayTheme(audio1StageThemePlayer)
+			PlayTheme(Theme1StagePlayer)
 		}
 	}
 
@@ -54,7 +54,7 @@ func (g *Game) UpdateSequencer() {
 	if g.state == StateInit {
 		changed := g.ChangeState(StateTitle)
 		if changed {
-			PlayTheme(audio1StageThemePlayer)
+			PlayTheme(Theme1StagePlayer)
 		}
 	}
 
@@ -64,7 +64,7 @@ func (g *Game) UpdateSequencer() {
 			g.reset()
 			changed := g.ChangeState(StateGameOver)
 			if changed {
-				PlayTheme(audioStageSelectThemePlayer)
+				PlayTheme(ThemeStageSelectPlayer)
 			}
 		}
 		if !g.playerOne.active && IsP1FireJustPressed() {
@@ -94,7 +94,7 @@ func (g *Game) UpdateSequencer() {
 		if IsP1FireJustPressed() || IsP2FireJustPressed() || time.Since(g.lastStateTransition) > time.Second*10 {
 			changed := g.ChangeState(StateTitle)
 			if changed {
-				PlayTheme(audio1StageThemePlayer)
+				PlayTheme(Theme1StagePlayer)
 			}
 		}
 		return
@@ -138,7 +138,7 @@ func (g *Game) CheckStartPressed() {
 		g.playerOne.active = true
 		changed := g.ChangeState(StateGame)
 		if changed {
-			PlayTheme(audio2StageThemePlayer)
+			PlayTheme(Theme2StagePlayer)
 		}
 	}
 	if IsP2FireJustPressed() {
@@ -148,7 +148,7 @@ func (g *Game) CheckStartPressed() {
 		g.playerTwo.active = true
 		changed := g.ChangeState(StateGame)
 		if changed {
-			PlayTheme(audio2StageThemePlayer)
+			PlayTheme(Theme2StagePlayer)
 		}
 	}
 }

@@ -44,6 +44,10 @@ func (shooter *constantShooter) shoot(x, y float64) {
 		mover := bul.getComponent(&ConstantMover{}).(*ConstantMover)
 		mover.speed = Vector{0, 2}
 		shooter.lastShot = time.Now()
+		// play fire sound
+		sfx_wpn_laser8Player.Rewind()
+		sfx_wpn_laser8Player.Play()
+
 	}
 	return
 
