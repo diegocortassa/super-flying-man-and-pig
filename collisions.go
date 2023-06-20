@@ -59,8 +59,9 @@ func isCollisionSquare(c1, c2 Box) bool {
 func HandleCollision(e1, e2 *Entity, g *Game) {
 	// playerOne bullet hit an enemy
 	if e1.entityType == typePlayerOneBullet {
-		e1.active = false // bullet destroyed
-
+		if !e2.exploding { // bullet pass trough enemy explosion
+			e1.active = false // bullet destroyed
+		}
 		// e2.active = false
 		e2.hit = true
 		e2.exploding = true
@@ -79,7 +80,9 @@ func HandleCollision(e1, e2 *Entity, g *Game) {
 	}
 	// playerTwo bullet hit an enemy
 	if e1.entityType == typePlayerTwoBullet {
-		e1.active = false // bullet destroyed
+		if !e2.exploding { // bullet pass trough enemy explosion
+			e1.active = false // bullet destroyed
+		}
 		// e2.active = false
 		e2.hit = true
 		e2.exploding = true

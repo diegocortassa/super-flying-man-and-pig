@@ -110,7 +110,7 @@ func (g *Game) reset() {
 
 func (g *Game) Update() error {
 
-	g.UpdateSequencer()
+	g.UpdateDirector()
 
 	switch g.state {
 	case StateTitle:

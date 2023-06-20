@@ -14,7 +14,7 @@ const (
 	attractRotationTime = 5 // Seconds before rotating attract screens
 )
 
-func (g *Game) UpdateSequencer() {
+func (g *Game) UpdateDirector() {
 
 	// g.state = StateHiscores
 
@@ -24,10 +24,6 @@ func (g *Game) UpdateSequencer() {
 	DebugPrintf(fmt.Sprintf("\tTotalAlloc = %v MiB", m.TotalAlloc/1024/1024))
 	DebugPrintf(fmt.Sprintf("\tSys = %v MiB", m.Sys/1024/1024))
 	DebugPrintf(fmt.Sprintf("\tNumGC = %v\n", m.NumGC))
-
-	// if sfx_exp_double3Player != nil {
-	// 	sfx_exp_double3Player.Play()
-	// }
 
 	// In all States
 	if IsExitJustPressed() {
@@ -52,10 +48,8 @@ func (g *Game) UpdateSequencer() {
 
 	// At first init
 	if g.state == StateInit {
-		changed := g.ChangeState(StateTitle)
-		if changed {
-			PlayTheme(Theme1StagePlayer)
-		}
+		g.state = StateTitle
+		PlayTheme(Theme1StagePlayer)
 	}
 
 	// *STATE* Game
