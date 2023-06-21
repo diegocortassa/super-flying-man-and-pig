@@ -9,7 +9,6 @@ import (
 
 var spawnScript = []TapeCommand{
 	{time.Millisecond * 1, "wait", ""},
-	{time.Millisecond * 1000, "Baloon", "Baloon"},
 	{time.Millisecond * 500, "Baloon", "Baloon"},
 	{time.Millisecond * 500, "Baloon", "Baloon"},
 	{time.Millisecond * 500, "Baloon", "Baloon"},
@@ -34,6 +33,12 @@ var spawnScript = []TapeCommand{
 	{time.Millisecond * 500, "Baloon", "Baloon"},
 	{time.Millisecond * 500, "Baloon", "Baloon"},
 	{time.Millisecond * 500, "Baloon", "Baloon"},
+	{time.Millisecond * 4000, "FlyingMan2", "FlyingMan2"},
+	{time.Millisecond * 300, "FlyingMan2", "FlyingMan2"},
+	{time.Millisecond * 300, "FlyingMan2", "FlyingMan2"},
+	{time.Millisecond * 300, "FlyingMan2", "FlyingMan2"},
+	{time.Millisecond * 300, "FlyingMan2", "FlyingMan2"},
+	{time.Millisecond * 300, "FlyingMan2", "FlyingMan2"},
 	{time.Millisecond * 5000, "rewind", ""},
 }
 
@@ -158,6 +163,42 @@ func spawnFlyingMan1(g *Game, x, y float64, speed Vector) {
 	g.enemies = append(g.enemies, enemy)
 }
 
+func spawnFlyingMan2(g *Game, x, y float64, speed Vector) {
+	enemy := newEntity(
+		"FlyingMan2",
+		Vector{x: screenWidth / 2, y: -spriteSize},
+	)
+	enemy.entityType = typeEnemy
+	enemy.scoreValue = 100
+	enemy.hitBoxes = append(enemy.hitBoxes, Box{5, 2, 15, 20})
+
+	sequences := map[string]*sequence{
+		"idle":    newSequence(animEnemyFlyingMan2, ANIM_FPS, true),
+		"destroy": newSequence(animSuperFlyingManDie, ANIM_FPS, false),
+	}
+	animator := newAnimator(enemy, sequences, "idle")
+	enemy.addComponent(animator)
+
+	sounds := map[Sound]*audio.Player{SoundDestroy: sfx_exp_odd1Player, SoundFire: sfx_wpn_laser8Player}
+	soundPlayer := newSoundPlayer(enemy, sounds)
+	enemy.addComponent(soundPlayer)
+
+	// cmover := NewConstantMover(enemy, speed)
+	cmover := NewScriptedMover(enemy, enemyRotateAndGo)
+	enemy.addComponent(cmover)
+
+	cshooter := NewAimedShooter(
+		enemy,
+		time.Millisecond*900,
+		g.enemiesBullettPool,
+		g.playerOne,
+		g.playerTwo,
+	)
+	enemy.addComponent(cshooter)
+
+	g.enemies = append(g.enemies, enemy)
+}
+
 func spawnCat(g *Game, x, y float64, speed Vector) {
 	enemy := newEntity(
 		"Cat",
@@ -209,6 +250,8 @@ func spawnEnemies(g *Game) {
 			spawnThing(g, x, -spriteSize, speed)
 		case "FlyingMan1":
 			spawnFlyingMan1(g, x, -spriteSize, speed)
+		case "FlyingMan2":
+			spawnFlyingMan2(g, x, -spriteSize, speed)
 		case "Cat":
 			spawnCat(g, x, -spriteSize, speed)
 		case "wait":

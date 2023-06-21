@@ -120,6 +120,7 @@ var (
 	animEnemyBaloonDie  = []int{37, 38, 38, 39, 39, 40, 40, 46, 47, 48, 49, 49} // EnemyBaloonDie
 	animExplosion       = []int{46, 47, 48, 49, 48, 47, 46}                     // Explosion
 	animEnemyFlyingMan1 = []int{41, 42, 43, 44, 45, 45, 43, 42}                 // EnemyFlyingMan1
+	animEnemyFlyingMan2 = []int{66, 67, 68, 69, 70, 70, 68, 67}                 // EnemyFlyingMan2
 	animEnemyThing      = []int{50, 51, 52, 53, 52, 51, 50}                     // EnemyThing
 	animEnemyCat        = []int{54, 55, 56, 57, 56, 55, 54}                     // EnemyCat
 
