@@ -43,6 +43,7 @@ const (
 	StateGame
 	StateAttract
 	StateHiscores
+	StateCredits
 	StateInsertName
 	StateGameOver
 	StateGameEnd
@@ -124,6 +125,8 @@ func (g *Game) Update() error {
 		g.UpdateGameState()
 	case StateHiscores:
 		g.UpdateHiscoresState()
+	case StateCredits:
+		g.UpdateCreditsState()
 	case StateGameEnd:
 		g.UpdateGameState()
 	}
@@ -146,6 +149,8 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		g.DrawGameState(screen)
 	case StateHiscores:
 		g.DrawHiscoreState(screen)
+	case StateCredits:
+		g.DrawCreditsState(screen)
 	case StateGameEnd:
 		g.DrawGameState(screen)
 	}

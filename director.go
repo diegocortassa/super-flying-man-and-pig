@@ -107,6 +107,15 @@ func (g *Game) UpdateDirector() {
 	if g.CurrentState == StateHiscores {
 		g.CheckStartPressed()
 		if time.Since(g.lastStateTransition) > time.Second*attractRotationTime {
+			_ = g.ChangeState(StateCredits)
+		}
+		return
+	}
+
+	// *STATE* Credits
+	if g.CurrentState == StateCredits {
+		g.CheckStartPressed()
+		if time.Since(g.lastStateTransition) > time.Second*attractRotationTime {
 			_ = g.ChangeState(StateTitle)
 		}
 		return
