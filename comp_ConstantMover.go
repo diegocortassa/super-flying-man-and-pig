@@ -19,7 +19,7 @@ func NewConstantMover(container *Entity, speed Vector) *ConstantMover {
 }
 
 func (mover *ConstantMover) Update() {
-	if !mover.active {
+	if !mover.active || mover.container.hit {
 		return
 	}
 	mover.container.position.x += mover.speed.x
