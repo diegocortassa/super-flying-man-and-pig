@@ -33,10 +33,19 @@ func (an *animator) Update() {
 
 	// TODO Collision logic should not be here !!
 	if an.container.hit && an.currentSeq == "idle" {
-		an.sequences["destroy"].currentFrame = 0
-		an.currentSeq = "destroy"
-		sfx_exp_odd1Player.Rewind()
-		sfx_exp_odd1Player.Play()
+		// in no sequence destroy exixts enemy just disappear
+		if _, ok := an.sequences["destroy"]; ok {
+			an.sequences["destroy"].currentFrame = 0
+			an.currentSeq = "destroy"
+			sp := an.container.getComponent(&SoundPlayer{}).(*SoundPlayer)
+			if sp != nil {
+				sp.PlaySound(SoundDestroy)
+
+			}
+		} else {
+			an.container.active = false
+		}
+
 	}
 	if an.container.hit && an.finished {
 		an.container.hit = false
@@ -71,9 +80,13 @@ func (an *animator) Draw(screen *ebiten.Image) {
 
 }
 
+// change animation sequence is exists
 func (an *animator) setSequence(name string) {
-	an.currentSeq = name
-	an.lastFrameChange = time.Now()
+	if _, ok := an.sequences[name]; ok {
+		an.currentSeq = name
+		an.lastFrameChange = time.Now()
+	}
+
 }
 
 type sequence struct {

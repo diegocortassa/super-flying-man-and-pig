@@ -18,7 +18,7 @@ import (
 
 const (
 	ANIM_FPS     = 15
-	MUSIC_VOLUME = 0.3
+	SOUND_VOLUME = 0.3 // Default sound volume
 )
 
 var (
@@ -179,31 +179,31 @@ func initSounds() {
 	audioContext = audio.NewContext(44100)
 
 	Theme1StagePlayer = LoadMp3Sound(Theme1Stage_mp3, true)
-	Theme1StagePlayer.SetVolume(MUSIC_VOLUME)
+	Theme1StagePlayer.SetVolume(SoundVolume)
 
 	Theme2StagePlayer = LoadMp3Sound(Theme2Stage_mp3, true)
-	Theme2StagePlayer.SetVolume(MUSIC_VOLUME)
+	Theme2StagePlayer.SetVolume(SoundVolume)
 
 	ThemeBossFightPlayer = LoadMp3Sound(ThemeBossFight_mp3, true)
-	ThemeBossFightPlayer.SetVolume(MUSIC_VOLUME)
+	ThemeBossFightPlayer.SetVolume(SoundVolume)
 
 	ThemeStageSelectPlayer = LoadMp3Sound(ThemeStageSelect_mp3, true)
-	ThemeStageSelectPlayer.SetVolume(MUSIC_VOLUME)
+	ThemeStageSelectPlayer.SetVolume(SoundVolume)
 
 	sfx_wpn_laser1Player = LoadWavSound(sfx_wpn_laser1_wav, false)
-	sfx_wpn_laser1Player.SetVolume(MUSIC_VOLUME)
+	sfx_wpn_laser1Player.SetVolume(SoundVolume)
 
 	sfx_exp_odd3Player = LoadWavSound(sfx_exp_odd3_wav, false)
-	sfx_exp_odd3Player.SetVolume(MUSIC_VOLUME)
+	sfx_exp_odd3Player.SetVolume(SoundVolume)
 
 	sfx_exp_odd1Player = LoadWavSound(sfx_exp_odd1_wav, false)
-	sfx_exp_odd1Player.SetVolume(MUSIC_VOLUME)
+	sfx_exp_odd1Player.SetVolume(SoundVolume)
 
 	sfx_exp_double3Player = LoadWavSound(sfx_exp_double3_wav, false)
-	sfx_exp_odd1Player.SetVolume(MUSIC_VOLUME)
+	sfx_exp_odd1Player.SetVolume(SoundVolume)
 
 	sfx_wpn_laser8Player = LoadWavSound(sfx_wpn_laser8_wav, false)
-	sfx_wpn_laser8Player.SetVolume(MUSIC_VOLUME)
+	sfx_wpn_laser8Player.SetVolume(SoundVolume)
 }
 
 func LoadMp3Sound(contents []byte, loop bool) *audio.Player {

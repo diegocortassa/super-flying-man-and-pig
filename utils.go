@@ -2,6 +2,7 @@ package main
 
 import (
 	"image/color"
+	"math"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
@@ -31,6 +32,20 @@ func DrawImageByCenter(screen *ebiten.Image, image *ebiten.Image, cx, cy int, op
 	screen.DrawImage(image, op)
 }
 
+func Distance(e1, e2 *Entity) float64 {
+	e1CenterX := e1.position.x + spriteSize/2
+	e1CenterY := e1.position.y + spriteSize/2
+	e2CenterX := e1.position.x + spriteSize/2
+	e2CenterY := e1.position.y + spriteSize/2
+
+	dist := math.Sqrt(math.Pow(e1CenterX-e2CenterX, 2) +
+		math.Pow(e1CenterY-e2CenterY, 2))
+
+	return dist
+}
+
+// keys abstraction
+
 func IsP1FireJustPressed() bool {
 	gamepadIDs := ebiten.GamepadIDs()
 	if len(gamepadIDs) >= 1 {
@@ -48,10 +63,12 @@ func IsP1FireJustPressed() bool {
 			}
 		}
 	}
-	return inpututil.IsKeyJustPressed(ebiten.KeyControlLeft)
+	if MameKeys {
+		return inpututil.IsKeyJustPressed(ebiten.KeyControlLeft)
+	}
+	return inpututil.IsKeyJustPressed(ebiten.KeyAltRight)
 }
 
-// keys abstraction
 func IsP2FireJustPressed() bool {
 	gamepadIDs := ebiten.GamepadIDs()
 	if len(gamepadIDs) >= 2 {
@@ -68,6 +85,11 @@ func IsP2FireJustPressed() bool {
 			}
 		}
 	}
+
+	if MameKeys {
+		return inpututil.IsKeyJustPressed(ebiten.KeyA)
+	}
+
 	return inpututil.IsKeyJustPressed(ebiten.KeyQ)
 }
 
@@ -76,6 +98,11 @@ func IsExitJustPressed() bool {
 }
 
 func IsResetJustPressed() bool {
+
+	if MameKeys {
+		return inpututil.IsKeyJustPressed(ebiten.KeyF1)
+	}
+
 	return inpututil.IsKeyJustPressed(ebiten.KeyR)
 }
 
@@ -92,5 +119,16 @@ func IsFullScreenJustPressed() bool {
 			}
 		}
 	}
+
+	if MameKeys {
+		return inpututil.IsKeyJustPressed(ebiten.KeyF2)
+	}
+
 	return inpututil.IsKeyJustPressed(ebiten.KeyF)
 }
+
+// - (not numeric keypad)
+// Volume Down
+
+// = (not numeric keypad)
+// Volume Up

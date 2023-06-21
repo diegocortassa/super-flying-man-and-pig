@@ -47,13 +47,13 @@ func (g *Game) UpdateDirector() {
 	}
 
 	// At first init
-	if g.state == StateInit {
-		g.state = StateTitle
+	if g.CurrentState == StateInit {
+		g.CurrentState = StateTitle
 		PlayTheme(Theme1StagePlayer)
 	}
 
 	// *STATE* Game
-	if g.state == StateGame {
+	if g.CurrentState == StateGame {
 		if !g.playerOne.active && !g.playerTwo.active {
 			g.reset()
 			changed := g.ChangeState(StateGameOver)
@@ -73,7 +73,7 @@ func (g *Game) UpdateDirector() {
 	}
 
 	// *STATE* Title
-	if g.state == StateTitle {
+	if g.CurrentState == StateTitle {
 		g.CheckStartPressed()
 		if time.Since(g.lastStateTransition) > time.Second*attractRotationTime {
 			g.reset()
@@ -84,7 +84,7 @@ func (g *Game) UpdateDirector() {
 	}
 
 	// *STATE* GameOver
-	if g.state == StateGameOver {
+	if g.CurrentState == StateGameOver {
 		if IsP1FireJustPressed() || IsP2FireJustPressed() || time.Since(g.lastStateTransition) > time.Second*10 {
 			changed := g.ChangeState(StateTitle)
 			if changed {
@@ -95,7 +95,7 @@ func (g *Game) UpdateDirector() {
 	}
 
 	// *STATE* Attract
-	if g.state == StateAttract {
+	if g.CurrentState == StateAttract {
 		g.CheckStartPressed()
 		if time.Since(g.lastStateTransition) > time.Second*attractRotationTime {
 			_ = g.ChangeState(StateHiscores)
@@ -104,7 +104,7 @@ func (g *Game) UpdateDirector() {
 	}
 
 	// *STATE* Highscores
-	if g.state == StateHiscores {
+	if g.CurrentState == StateHiscores {
 		g.CheckStartPressed()
 		if time.Since(g.lastStateTransition) > time.Second*attractRotationTime {
 			_ = g.ChangeState(StateTitle)
@@ -116,8 +116,8 @@ func (g *Game) UpdateDirector() {
 // Change game stare
 func (g *Game) ChangeState(newState State) bool {
 	if time.Since(g.lastStateTransition) > STATECOOLDOWN {
-		g.PreviousState = g.state
-		g.state = newState
+		g.PreviousState = g.CurrentState
+		g.CurrentState = newState
 		g.lastStateTransition = time.Now()
 		return true
 	}

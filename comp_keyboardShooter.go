@@ -42,14 +42,15 @@ func (ks *keyboardShooter) Draw(screen *ebiten.Image) {
 
 func (ks *keyboardShooter) shoot() {
 	if bul, ok := BullettFromPool(ks.bulletsPool); ok {
-		bul.active = true
+		// Play fire sound
+		sp := ks.container.getComponent(&SoundPlayer{}).(*SoundPlayer)
+		sp.PlaySound(SoundFire)
+		// shoot
 		bul.position.x = ks.container.position.x
 		bul.position.y = ks.container.position.y
+		bul.active = true
 		// bul.rotation = 270 * (math.Pi / 180)
 		ks.lastShot = time.Now()
-		// Play fire sound
-		sfx_wpn_laser1Player.Rewind()
-		sfx_wpn_laser1Player.Play()
 	}
 	return
 

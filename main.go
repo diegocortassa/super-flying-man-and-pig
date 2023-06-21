@@ -35,7 +35,7 @@ const (
 	scrollSpeed       = 30 // speed in 1 pixel per microsecond
 )
 
-type State int
+type State int // /possible scenes/states the game can be
 
 const (
 	StateInit State = iota
@@ -49,9 +49,11 @@ const (
 )
 
 var (
-	debug      bool
-	fullscreen bool
-	flagCRT    bool
+	debug       bool    // command line flag
+	fullScreen  bool    // command line flag
+	flagCRT     bool    // command line flag
+	MameKeys    bool    // command line flag
+	SoundVolume float64 // command line argument
 
 	//go:embed crt.go
 	crtGo []byte
@@ -60,9 +62,8 @@ var (
 // Game controls overall gameplay.
 type Game struct {
 	crtShader *ebiten.Shader
-	state     State
-	gameMap   []int
-	position  int
+	gameMap   []int // Tiled world map
+	position  int   // vertical position on screen map
 	hiScores  int
 
 	touchIDs   []ebiten.TouchID
@@ -76,21 +77,14 @@ type Game struct {
 	enemiesBullettPool   []*Entity
 	lastEvent            time.Time
 
-	CurrentState        State
-	PreviousState       State
-	lastStateTransition time.Time
-}
-
-func init() {
-	// initializations before creating the game
-	rand.Seed(time.Now().UnixNano())
-	initAssets()
-	initSounds()
+	CurrentState        State     // the state/scene the game is currently playing
+	PreviousState       State     // the previous state/scene the game was
+	lastStateTransition time.Time // last time the state/scene was changed
 }
 
 func (g *Game) init() {
 	// initializations before running the game
-	g.state = StateInit
+	g.CurrentState = StateInit
 	g.hiScores = 1230
 	g.PreviousState = StateInit
 	g.lastStateTransition = time.Now()
@@ -105,14 +99,14 @@ func (g *Game) reset() {
 	// Enemies
 	g.enemies = nil
 	// Enemies Bullets
-	g.enemiesBullettPool = initBulletPool("EnemyBullet", typeEnemyBullet, animEnemyBullet1, 20, 10, Vector{0, 0}, Box{9, 9, 6, 6})
+	g.enemiesBullettPool = initBulletPool("EnemyBullet", typeEnemyBullet, animEnemyBullet1, 20, 10, Vector{0, 2}, Box{9, 9, 6, 6})
 }
 
 func (g *Game) Update() error {
 
 	g.UpdateDirector()
 
-	switch g.state {
+	switch g.CurrentState {
 	case StateTitle:
 		g.UpdateTileState()
 	case StateAttract:
@@ -134,7 +128,7 @@ func (g *Game) Update() error {
 
 func (g *Game) Draw(screen *ebiten.Image) {
 
-	switch g.state {
+	switch g.CurrentState {
 	case StateTitle:
 		g.DrawTitleState(screen)
 	case StateAttract:
@@ -199,18 +193,30 @@ func NewGame(flagCRT bool) ebiten.Game {
 }
 
 func main() {
-	flag.BoolVar(&fullscreen, "fullscreen", false, "run in fullscreen mode")
+
+	flag.BoolVar(&fullScreen, "fullscreen", false, "run in fullscreen mode")
+	flag.BoolVar(&MameKeys, "mamekeys", false, "Use MAME compatible key mapping")
 	flag.BoolVar(&flagCRT, "crt", false, "enable the CRT simulation")
 	flag.BoolVar(&debug, "debug", false, "enable debug")
+	flag.Float64Var(&SoundVolume, "soundvolume", SOUND_VOLUME*10, "Set sound volume 0 to 10")
 	flag.Parse()
 
-	// g := &Game{}
-	// g.init()
+	// Volume must be a float64 from 0 to 1
+	if SoundVolume > 10 {
+		SoundVolume = 10
+	}
+	SoundVolume /= float64(10)
+
+	// initializations before creating the game
+	rand.Seed(time.Now().UnixNano())
+	initAssets()
+	initSounds()
+
 	g := NewGame(flagCRT)
 
 	ebiten.SetWindowSize(screenWidth*zoom, screenHeight*zoom)
 	ebiten.SetWindowTitle("Super flying man and Pig")
-	if fullscreen {
+	if fullScreen {
 		ebiten.SetFullscreen(true)
 	}
 	// ebiten.SetWindowResizable(true)

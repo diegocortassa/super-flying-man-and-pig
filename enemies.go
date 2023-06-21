@@ -3,6 +3,8 @@ package main
 import (
 	"math/rand"
 	"time"
+
+	"github.com/hajimehoshi/ebiten/v2/audio"
 )
 
 func cleanEnemyList(g *Game) {
@@ -33,6 +35,10 @@ func spawnBaloon(g *Game, x, y float64, speed Vector) {
 	animator := newAnimator(enemy, sequences, "idle")
 	enemy.addComponent(animator)
 
+	sounds := map[Sound]*audio.Player{SoundDestroy: sfx_exp_odd1Player, SoundFire: sfx_wpn_laser8Player}
+	soundPlayer := newSoundPlayer(enemy, sounds)
+	enemy.addComponent(soundPlayer)
+
 	cmover := NewConstantMover(enemy, Vector{x: 0.2, y: 1})
 	enemy.addComponent(cmover)
 	g.enemies = append(g.enemies, enemy)
@@ -53,6 +59,10 @@ func spawnThing(g *Game, x, y float64, speed Vector) {
 	}
 	animator := newAnimator(enemy, sequences, "idle")
 	enemy.addComponent(animator)
+
+	sounds := map[Sound]*audio.Player{SoundDestroy: sfx_exp_odd1Player, SoundFire: sfx_wpn_laser8Player}
+	soundPlayer := newSoundPlayer(enemy, sounds)
+	enemy.addComponent(soundPlayer)
 
 	cmover := NewConstantMover(enemy, Vector{x: 0.2, y: 1})
 	enemy.addComponent(cmover)
@@ -75,14 +85,22 @@ func spawnFlyingMan1(g *Game, x, y float64, speed Vector) {
 	animator := newAnimator(enemy, sequences, "idle")
 	enemy.addComponent(animator)
 
+	sounds := map[Sound]*audio.Player{SoundDestroy: sfx_exp_odd1Player, SoundFire: sfx_wpn_laser8Player}
+	soundPlayer := newSoundPlayer(enemy, sounds)
+	enemy.addComponent(soundPlayer)
+
 	cmover := NewConstantMover(enemy, speed)
 	enemy.addComponent(cmover)
-	cshooter := NewConstantShooter(
+
+	cshooter := NewAimedShooter(
 		enemy,
 		time.Millisecond*900,
 		g.enemiesBullettPool,
+		g.playerOne,
+		g.playerTwo,
 	)
 	enemy.addComponent(cshooter)
+
 	g.enemies = append(g.enemies, enemy)
 }
 
@@ -101,6 +119,10 @@ func spawnCat(g *Game, x, y float64, speed Vector) {
 	}
 	animator := newAnimator(enemy, sequences, "idle")
 	enemy.addComponent(animator)
+
+	sounds := map[Sound]*audio.Player{SoundDestroy: sfx_exp_odd1Player, SoundFire: sfx_wpn_laser8Player}
+	soundPlayer := newSoundPlayer(enemy, sounds)
+	enemy.addComponent(soundPlayer)
 
 	cmover := NewConstantMover(enemy, speed)
 	enemy.addComponent(cmover)

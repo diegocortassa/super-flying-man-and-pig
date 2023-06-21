@@ -12,24 +12,6 @@ import (
 
 func (g *Game) UpdateAttractState() {
 
-	DebugPrintf("--- Update Loop ---")
-
-	// DebugPrintf("player", g.playerOne.name, g.playerOne.active)
-	// g.playerOne.Update(g)
-
-	// DebugPrintf("player", g.playerTwo.name, g.playerTwo.active)
-	// g.playerTwo.Update(g)
-
-	// for _, playerOneBullet := range g.playerOneBullettPool {
-	// 	DebugPrintf("playerOneBullet", playerOneBullet.name, playerOneBullet.active)
-	// 	playerOneBullet.Update(g)
-	// }
-
-	// for _, playerTwoBullet := range g.playerTwoBullettPool {
-	// 	DebugPrintf("playerTwoBullet", playerTwoBullet.name, playerTwoBullet.active)
-	// 	playerTwoBullet.Update(g)
-	// }
-
 	for _, enemy := range g.enemies {
 		DebugPrintf("enemy", enemy.name, enemy.active)
 		enemy.Update(g)
@@ -154,4 +136,6 @@ func (g *Game) DrawAttractState(screen *ebiten.Image) {
 	} else {
 		DrawTextWithShadowByCenter(screen, "GAME OVER", arcadeFont, screenWidth/2, screenHeight/2, ColorYellow)
 	}
+	DrawTextWithShadowByCenter(screen, "PRESS FIRE TO PLAY", arcadeFont, screenWidth/2, screenHeight/2+20, color.White)
+
 }

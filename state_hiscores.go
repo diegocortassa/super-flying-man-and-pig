@@ -19,7 +19,7 @@ func (g *Game) DrawHiscoreState(screen *ebiten.Image) {
 	DrawTextByCenter(screen, "SCORE", arcadeFont, screenWidth/6*3, screenHeight/4+20, color.White)
 	DrawTextByCenter(screen, "NAME", arcadeFont, screenWidth/6*5, screenHeight/4+20, color.White)
 
-	var hiScores = [][]string{{"1", "50000", "DIE"}, {"2", "40000", "LIV"}, {"3", "30000", "AND"}, {"4", "20000", "NOR"}, {"5", "100", "MRJ"}}
+	var hiScores = [][]string{{"1", "50000", "DIE"}, {"2", "40000", "LIV"}, {"3", "30000", "AND"}, {"4", "20000", "NOR"}, {"5", "10000", "MRJ"}}
 	line := 40
 
 	for _, score := range hiScores {

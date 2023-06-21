@@ -13,6 +13,7 @@ import (
 func (g *Game) UpdateGameState() {
 
 	DebugPrintf("--- Update Loop ---")
+	DebugPrintf("position", g.position)
 
 	DebugPrintf("player", g.playerOne.name, g.playerOne.active)
 	g.playerOne.Update(g)
