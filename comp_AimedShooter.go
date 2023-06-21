@@ -1,14 +1,11 @@
 package main
 
 import (
-	"fmt"
 	"math"
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
 )
-
-//// WIP !!!
 
 type AimedShooter struct {
 	active    bool
@@ -54,19 +51,18 @@ func (shooter *AimedShooter) shoot(x, y float64) {
 
 		mover := bul.getComponent(&ConstantMover{}).(*ConstantMover)
 
-		// find nearest player
+		var px, py float64
 		distP1 := Distance(shooter.container, shooter.p1)
 		distP2 := Distance(shooter.container, shooter.p2)
-		fmt.Println(distP1, distP2)
-		// if distP1 < distP2 {
-		// 	px := shooter.p1.position.x
-		// 	py := shooter.p1.position.y
-		// } else if distP1 < distP2 {
-		// 	px := shooter.p1.position.x
-		// 	py := shooter.p1.position.x
-		// }
-		px := shooter.p1.position.x
-		py := shooter.p1.position.y
+
+		// find nearest player
+		if !shooter.p2.active || distP1 < distP2 {
+			px = shooter.p1.position.x
+			py = shooter.p1.position.y
+		} else {
+			px = shooter.p2.position.x
+			py = shooter.p2.position.y
+		}
 
 		sx := shooter.container.position.x
 		sy := shooter.container.position.y
@@ -78,7 +74,7 @@ func (shooter *AimedShooter) shoot(x, y float64) {
 		dy := py - sy
 
 		distance := math.Sqrt(dx*dx + dy*dy)
-		// multiply te normalized result by desired speed
+		// multiply the normalized result by desired speed
 		speedX := (dx / distance) * speed
 		speedY := (dy / distance) * speed
 
