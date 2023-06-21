@@ -6,7 +6,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-type constantShooter struct {
+type ConstantShooter struct {
 	active    bool
 	container *Entity
 	trigger   time.Duration
@@ -14,8 +14,8 @@ type constantShooter struct {
 	lastShot  time.Time
 }
 
-func NewConstantShooter(container *Entity, trigger time.Duration, pool []*Entity) *constantShooter {
-	return &constantShooter{
+func NewConstantShooter(container *Entity, trigger time.Duration, pool []*Entity) *ConstantShooter {
+	return &ConstantShooter{
 		active:    true,
 		pool:      pool,
 		container: container,
@@ -24,7 +24,7 @@ func NewConstantShooter(container *Entity, trigger time.Duration, pool []*Entity
 	}
 }
 
-func (shooter *constantShooter) Update() {
+func (shooter *ConstantShooter) Update() {
 	if time.Since(shooter.lastShot) >= shooter.trigger {
 		shooter.shoot(shooter.container.position.x+25, shooter.container.position.y-20)
 		shooter.lastShot = time.Now()
@@ -32,12 +32,12 @@ func (shooter *constantShooter) Update() {
 	return
 }
 
-func (shooter *constantShooter) Draw(screen *ebiten.Image) {
+func (shooter *ConstantShooter) Draw(screen *ebiten.Image) {
 	return
 }
 
 // Shoot bullet from pool starting at position x,y
-func (shooter *constantShooter) shoot(x, y float64) {
+func (shooter *ConstantShooter) shoot(x, y float64) {
 	if bul, ok := BullettFromPool(shooter.pool); ok {
 		// do not shoot while exploding
 		if shooter.container.exploding {
