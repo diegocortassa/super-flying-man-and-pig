@@ -7,8 +7,6 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/audio"
 )
 
-var lastSpawn = time.Now()
-var spawnHead = 0
 var spawnScript = []TapeCommand{
 	{time.Millisecond * 1, "wait", ""},
 	{time.Millisecond * 1000, "Baloon", "Baloon"},
@@ -200,9 +198,9 @@ func spawnEnemies(g *Game) {
 	max := screenWidth - 50.0
 	x := rand.Float64()*(max-min) + min
 
-	c := spawnScript[spawnHead]
-	DebugPrintf("time.Since(lastSpawn):", time.Since(lastSpawn), "spawnHead:", spawnHead)
-	if time.Since(lastSpawn) > c.time {
+	c := spawnScript[g.spawnHead]
+	DebugPrintf("time.Since(lastSpawn):", time.Since(g.lastSpawn), "spawnHead:", g.spawnHead)
+	if time.Since(g.lastSpawn) > c.time {
 		DebugPrintf("Spawn Command:", c)
 		switch c.command {
 		case "Baloon":
@@ -215,12 +213,12 @@ func spawnEnemies(g *Game) {
 			spawnCat(g, x, -spriteSize, speed)
 		case "wait":
 		case "rewind":
-			spawnHead = -1
+			g.spawnHead = -1
 		}
 
-		lastSpawn = time.Now()
-		if spawnHead < len(spawnScript)-1 {
-			spawnHead++
+		g.lastSpawn = time.Now()
+		if g.spawnHead < len(spawnScript)-1 {
+			g.spawnHead++
 		}
 	}
 

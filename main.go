@@ -80,6 +80,9 @@ type Game struct {
 	CurrentState        State     // the state/scene the game is currently playing
 	PreviousState       State     // the previous state/scene the game was
 	lastStateTransition time.Time // last time the state/scene was changed
+
+	lastSpawn time.Time // last time an enemy was spawned
+	spawnHead int       // index on spawn script
 }
 
 func (g *Game) init() {
@@ -100,6 +103,8 @@ func (g *Game) reset() {
 	g.enemies = nil
 	// Enemies Bullets
 	g.enemiesBullettPool = initBulletPool("EnemyBullet", typeEnemyBullet, animEnemyBullet1, 20, 10, Vector{0, 2}, Box{9, 9, 6, 6})
+	g.lastSpawn = time.Now()
+	g.spawnHead = 0
 }
 
 func (g *Game) Update() error {
