@@ -7,6 +7,61 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/audio"
 )
 
+var lastSpawn = time.Now()
+var spawnHead = 0
+var spawnScript = []TapeCommand{
+	{time.Millisecond * 1, "wait", ""},
+	{time.Millisecond * 1000, "Baloon", "Baloon"},
+	{time.Millisecond * 500, "Baloon", "Baloon"},
+	{time.Millisecond * 500, "Baloon", "Baloon"},
+	{time.Millisecond * 500, "Baloon", "Baloon"},
+	{time.Millisecond * 500, "Baloon", "Baloon"},
+	{time.Millisecond * 2000, "Thing", ""},
+	{time.Millisecond * 1000, "Thing", ""},
+	{time.Millisecond * 1000, "Thing", ""},
+	{time.Millisecond * 1000, "Thing", ""},
+	{time.Millisecond * 4000, "FlyingMan1", ""},
+	{time.Millisecond * 300, "FlyingMan1", ""},
+	{time.Millisecond * 300, "FlyingMan1", ""},
+	{time.Millisecond * 300, "FlyingMan1", ""},
+	{time.Millisecond * 300, "FlyingMan1", ""},
+	{time.Millisecond * 300, "FlyingMan1", ""},
+	{time.Millisecond * 5000, "Cat", ""},
+	{time.Millisecond * 1000, "Cat", ""},
+	{time.Millisecond * 1000, "Cat", ""},
+	{time.Millisecond * 1000, "Cat", ""},
+	{time.Millisecond * 1000, "Cat", ""},
+	{time.Millisecond * 3000, "Baloon", "Baloon"},
+	{time.Millisecond * 500, "Baloon", "Baloon"},
+	{time.Millisecond * 500, "Baloon", "Baloon"},
+	{time.Millisecond * 500, "Baloon", "Baloon"},
+	{time.Millisecond * 500, "Baloon", "Baloon"},
+	{time.Millisecond * 5000, "rewind", ""},
+}
+
+var enemyRotateAndGo = []TapeCommand{
+	//     270
+	// 180     0
+	//     90
+	{time.Millisecond * 1, "rotate", "90"},
+	{time.Millisecond * 1000, "speed", "2 2"},
+	{time.Millisecond * 1500, "rotateAdd", "22"},
+	{time.Millisecond * 200, "rotateAdd", "22"},
+	{time.Millisecond * 200, "rotateAdd", "22"},
+	{time.Millisecond * 200, "rotateAdd", "22"},
+	{time.Millisecond * 200, "rotateAdd", "22"},
+	{time.Millisecond * 200, "rotateAdd", "22"},
+	{time.Millisecond * 200, "rotateAdd", "22"},
+	{time.Millisecond * 200, "rotateAdd", "22"},
+	{time.Millisecond * 200, "rotateAdd", "22"},
+	{time.Millisecond * 200, "rotateAdd", "22"},
+	{time.Millisecond * 200, "rotateAdd", "22"},
+	{time.Millisecond * 200, "rotateAdd", "22"},
+	{time.Millisecond * 200, "rotateAdd", "22"},
+	{time.Millisecond * 200, "rotateAdd", "22"},
+	{time.Millisecond * 200, "wait", ""},
+}
+
 func cleanEnemyList(g *Game) {
 	for i := 0; i < len(g.enemies); i++ {
 		DebugPrintf("cleanEnemyList", len(g.enemies))
@@ -89,7 +144,8 @@ func spawnFlyingMan1(g *Game, x, y float64, speed Vector) {
 	soundPlayer := newSoundPlayer(enemy, sounds)
 	enemy.addComponent(soundPlayer)
 
-	cmover := NewConstantMover(enemy, speed)
+	// cmover := NewConstantMover(enemy, speed)
+	cmover := NewScriptedMover(enemy, enemyRotateAndGo)
 	enemy.addComponent(cmover)
 
 	cshooter := NewAimedShooter(
@@ -139,23 +195,50 @@ func spawnCat(g *Game, x, y float64, speed Vector) {
 
 func spawnEnemies(g *Game) {
 
-	x := rand.Float64() * float64(screenWidth)
 	speed := Vector{rand.Float64()*2.0 - 1.0, rand.Float64()}
+	min := 50.0
+	max := screenWidth - 50.0
+	x := rand.Float64()*(max-min) + min
 
-	// Enemies
-	if g.position%96 == 0 {
-		spawnBaloon(g, x, -spriteSize, speed)
-	}
-	if g.position%108 == 0 {
-		spawnThing(g, x, -spriteSize, speed)
+	c := spawnScript[spawnHead]
+	DebugPrintf("time.Since(lastSpawn):", time.Since(lastSpawn), "spawnHead:", spawnHead)
+	if time.Since(lastSpawn) > c.time {
+		DebugPrintf("Spawn Command:", c)
+		switch c.command {
+		case "Baloon":
+			spawnBaloon(g, screenWidth/2, -spriteSize, speed)
+		case "Thing":
+			spawnThing(g, x, -spriteSize, speed)
+		case "FlyingMan1":
+			spawnFlyingMan1(g, x, -spriteSize, speed)
+		case "Cat":
+			spawnCat(g, x, -spriteSize, speed)
+		case "wait":
+		case "rewind":
+			spawnHead = -1
+		}
 
+		lastSpawn = time.Now()
+		if spawnHead < len(spawnScript)-1 {
+			spawnHead++
+		}
 	}
-	if g.position%141 == 0 {
-		// Enemies
-		spawnFlyingMan1(g, x, -spriteSize, speed)
 
-	}
-	if g.position%303 == 0 {
-		spawnCat(g, x, -spriteSize, speed)
-	}
+	// Old pseudo random spawning
+	// if g.position%96 == 0 {
+	// 	// spawnBaloon(g, x, -spriteSize, speed)
+	// 	spawnBaloon(g, screenWidth/2, -spriteSize, speed)
+	// }
+	// if g.position%108 == 0 {
+	// 	spawnThing(g, x, -spriteSize, speed)
+
+	// }
+	// if g.position%141 == 0 {
+	// 	// Enemies
+	// 	spawnFlyingMan1(g, x, -spriteSize, speed)
+
+	// }
+	// if g.position%303 == 0 {
+	// 	spawnCat(g, x, -spriteSize, speed)
+	// }
 }
