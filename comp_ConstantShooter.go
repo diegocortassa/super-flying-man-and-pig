@@ -25,7 +25,7 @@ func NewConstantShooter(container *Entity, trigger time.Duration, pool []*Entity
 }
 
 func (shooter *ConstantShooter) Update() {
-	if time.Since(shooter.lastShot) >= shooter.trigger {
+	if time.Since(shooter.lastShot) >= shooter.trigger && !shooter.container.hit {
 		shooter.shoot(shooter.container.position.x+25, shooter.container.position.y-20)
 		shooter.lastShot = time.Now()
 	}
