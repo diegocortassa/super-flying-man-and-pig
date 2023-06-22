@@ -30,6 +30,4 @@ func (g *Game) DrawHiscoreState(screen *ebiten.Image) {
 	}
 
 	DrawTextByCenter(screen, "PRESS FIRE TO PLAY", arcadeFont, screenWidth/2, screenHeight/3*2+20, color.White)
-
-	DrawTextByCenter(screen, "© 1985   DIEGO CORTASSA", arcadeFont, screenWidth/2, screenHeight/8*7, ColorYellow)
 }

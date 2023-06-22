@@ -32,6 +32,4 @@ func (g *Game) DrawCreditsState(screen *ebiten.Image) {
 	DrawTextByCenter(screen, "ANDREA PENNAZIO", arcadeFont, screenWidth/2, screenHeight/6+line, ColorYellow)
 	//
 	DrawTextByCenter(screen, "PRESS FIRE TO PLAY", arcadeFont, screenWidth/2, screenHeight/3*2+20, color.White)
-
-	DrawTextByCenter(screen, "© 1985   DIEGO CORTASSA", arcadeFont, screenWidth/2, screenHeight/8*7, ColorYellow)
 }
