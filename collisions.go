@@ -62,15 +62,8 @@ func HandleCollision(e1, e2 *Entity, g *Game) {
 		if !e2.exploding { // bullet pass trough enemy explosion
 			e1.active = false // bullet destroyed
 		}
-		// e2.active = false
 		e2.hit = true
 		e2.exploding = true
-		// e2an := e1.getComponent(&animator{}).(*animator)
-		// e2an.lastFrameChange = time.Now()
-		// e2an.setSequence("destroy")
-		// if e2an.currentSeq != "destroy" {
-		// 	fmt.Println("**", e2an.current)
-		// 	e2an.currentSeq = "destroy"
 
 		g.playerOne.scores += e2.scoreValue
 		if g.playerOne.scores > g.hiScores {
@@ -81,9 +74,8 @@ func HandleCollision(e1, e2 *Entity, g *Game) {
 	// playerTwo bullet hit an enemy
 	if e1.entityType == typePlayerTwoBullet {
 		if !e2.exploding { // bullet pass trough enemy explosion
-			e1.active = false // bullet destroyed
+			e1.active = false // bullet destroyed no explosion anim
 		}
-		// e2.active = false
 		e2.hit = true
 		e2.exploding = true
 		g.playerTwo.scores += e2.scoreValue
@@ -97,21 +89,18 @@ func HandleCollision(e1, e2 *Entity, g *Game) {
 	if e1.entityType == typeEnemyBullet || e1.entityType == typeEnemy {
 
 		if e1.entityType == typeEnemyBullet {
-			e1.active = false // bullet ha no idle anim, just disappears
-		} else {
-			e1.hit = true // trigger idle anim, animator will take care of setting active to false when anim finishes
+			e1.active = false // bullet destroyed no explosion anim
+		} else if !e2.exploding {
+			e1.hit = true // animator will take care of playing explosion setting active to false when anim finishes
 		}
 
 		// TODO hit logic is patially shared with animator because it takes care of playing the destroy animation
 		// TODO once an enemy is hit should not collide but adding && !e1.hit here gives superpowers to player
 		if !e2.invulnerable && !e2.hit && !e1.exploding {
 			// animator will reset hit and invulnerable flags
-			e2.invulnerable = true
 			e2.hit = true
 			// animator will set active to false if no more lives
 			e2.lives -= 1
-			// e2an := e1.getComponent(&animator{}).(*animator)
-			// e2an.lastFrameChange = time.Now()
 			return
 		}
 	}

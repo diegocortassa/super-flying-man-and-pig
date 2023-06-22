@@ -4,6 +4,7 @@ import (
 	_ "embed"
 	"fmt"
 	"reflect"
+	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
 )
@@ -27,20 +28,21 @@ const (
 )
 
 type Entity struct {
-	name         string
-	active       bool
-	position     Vector
-	rotation     float64
-	lives        int
-	scores       int
-	scoreValue   int
-	hitBoxes     []Box
-	components   []Component
-	parent       *Entity
-	entityType   entityType
-	hit          bool
-	exploding    bool
-	invulnerable bool
+	name                string
+	active              bool
+	position            Vector
+	rotation            float64
+	lives               int
+	scores              int
+	scoreValue          int
+	hitBoxes            []Box
+	components          []Component
+	parent              *Entity
+	entityType          entityType
+	hit                 bool
+	exploding           bool
+	invulnerable        bool
+	invulnerableSetTime time.Time
 }
 
 func newEntity(name string, position Vector) *Entity {
