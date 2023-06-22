@@ -174,22 +174,15 @@ func (g *GameWithCRTEffect) DrawFinalScreen(screen ebiten.FinalScreen, offscreen
 		g.crtShader = s
 	}
 
-	doubledOffscreen := ebiten.NewImage(screenWidth*2, screenHeight*2)
-	opts := &ebiten.DrawImageOptions{}
-	opts.GeoM.Scale(2.0, 2.0)
-	doubledOffscreen.DrawImage(offscreen, opts)
-
-	os := doubledOffscreen.Bounds().Size()
+	os := offscreen.Bounds().Size()
 	op := &ebiten.DrawRectShaderOptions{}
-	op.Images[0] = doubledOffscreen
+	op.Images[0] = offscreen
 	op.GeoM = geoM
 	screen.DrawRectShader(os.X, os.Y, g.crtShader, op)
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
-	if flagCRT {
-		return screenWidth * 2, screenHeight * 2
-	}
+	// return screenWidth + 30, screenHeight + 30
 	return screenWidth, screenHeight
 }
 
