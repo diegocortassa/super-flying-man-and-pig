@@ -54,7 +54,10 @@ func (g *Game) UpdateDirector() {
 
 	// *STATE* Game
 	if g.CurrentState == StateGame {
-		if !g.playerOne.active && !g.playerTwo.active {
+		if !g.playerOne.active &&
+			!g.playerTwo.active &&
+			time.Since(g.playerOne.invulnerableSetTime) > STATECOOLDOWN &&
+			time.Since(g.playerTwo.invulnerableSetTime) > STATECOOLDOWN {
 			g.reset()
 			changed := g.ChangeState(StateGameOver)
 			if changed {
@@ -64,10 +67,15 @@ func (g *Game) UpdateDirector() {
 		if !g.playerOne.active && IsP1FireJustPressed() {
 			g.resetPlayerOne()
 			g.playerOne.active = true
+			g.playerOne.invulnerable = true
+			g.playerOne.invulnerableSetTime = time.Now()
 		}
 		if !g.playerTwo.active && IsP2FireJustPressed() {
 			g.resetPlayerTwo()
 			g.playerTwo.active = true
+			g.playerTwo.invulnerable = true
+			g.playerTwo.invulnerableSetTime = time.Now()
+
 		}
 		return
 	}
