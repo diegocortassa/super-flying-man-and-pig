@@ -46,53 +46,6 @@ func Distance(e1, e2 *Entity) float64 {
 
 // keys abstraction
 
-func IsP1FireJustPressed() bool {
-	gamepadIDs := ebiten.GamepadIDs()
-	if len(gamepadIDs) >= 1 {
-		id := gamepadIDs[0]
-		for b := ebiten.StandardGamepadButton(0); b <= ebiten.StandardGamepadButtonMax; b++ {
-			// if inpututil.IsGamepadButtonJustPressed(id, b) {
-			if inpututil.IsStandardGamepadButtonJustPressed(id, b) {
-				if b == ebiten.StandardGamepadButtonRightTop ||
-					b == ebiten.StandardGamepadButtonRightLeft ||
-					b == ebiten.StandardGamepadButtonRightRight ||
-					b == ebiten.StandardGamepadButtonRightBottom ||
-					b == ebiten.StandardGamepadButtonCenterRight {
-					return true
-				}
-			}
-		}
-	}
-	if MameKeys {
-		return inpututil.IsKeyJustPressed(ebiten.KeyControlLeft)
-	}
-	return inpututil.IsKeyJustPressed(ebiten.KeyAltRight)
-}
-
-func IsP2FireJustPressed() bool {
-	gamepadIDs := ebiten.GamepadIDs()
-	if len(gamepadIDs) >= 2 {
-		id := gamepadIDs[1]
-		for b := ebiten.StandardGamepadButton(0); b <= ebiten.StandardGamepadButtonMax; b++ {
-			if inpututil.IsStandardGamepadButtonJustPressed(id, b) {
-				if b == ebiten.StandardGamepadButtonRightTop ||
-					b == ebiten.StandardGamepadButtonRightLeft ||
-					b == ebiten.StandardGamepadButtonRightRight ||
-					b == ebiten.StandardGamepadButtonRightBottom ||
-					b == ebiten.StandardGamepadButtonCenterRight {
-					return true
-				}
-			}
-		}
-	}
-
-	if MameKeys {
-		return inpututil.IsKeyJustPressed(ebiten.KeyA)
-	}
-
-	return inpututil.IsKeyJustPressed(ebiten.KeyQ)
-}
-
 func IsExitJustPressed() bool {
 	return inpututil.IsKeyJustPressed(ebiten.KeyEscape)
 }
@@ -132,3 +85,157 @@ func IsFullScreenJustPressed() bool {
 
 // = (not numeric keypad)
 // Volume Up
+
+// P1
+
+func IsP1FireJustPressed() bool {
+	gamepadIDs := ebiten.GamepadIDs()
+	if len(gamepadIDs) >= 1 {
+		id := gamepadIDs[0]
+		for b := ebiten.StandardGamepadButton(0); b <= ebiten.StandardGamepadButtonMax; b++ {
+			// if inpututil.IsGamepadButtonJustPressed(id, b) {
+			if inpututil.IsStandardGamepadButtonJustPressed(id, b) {
+				if b == ebiten.StandardGamepadButtonRightTop ||
+					b == ebiten.StandardGamepadButtonRightLeft ||
+					b == ebiten.StandardGamepadButtonRightRight ||
+					b == ebiten.StandardGamepadButtonRightBottom ||
+					b == ebiten.StandardGamepadButtonCenterRight {
+					return true
+				}
+			}
+		}
+	}
+	if MameKeys {
+		return inpututil.IsKeyJustPressed(ebiten.KeyControlLeft)
+	}
+	if inpututil.IsKeyJustPressed(ebiten.KeyAltRight) ||
+		inpututil.IsKeyJustPressed(ebiten.KeyControlRight) ||
+		inpututil.IsKeyJustPressed(ebiten.KeySpace) ||
+		inpututil.IsKeyJustPressed(ebiten.KeyAltLeft) ||
+		inpututil.IsKeyJustPressed(ebiten.KeyControlLeft) {
+		return true
+	}
+	return false
+}
+
+func IsP1FirePressed() bool {
+	gamepadIDs := ebiten.GamepadIDs()
+	if len(gamepadIDs) >= 1 {
+		id := gamepadIDs[0]
+		for b := ebiten.StandardGamepadButton(0); b <= ebiten.StandardGamepadButtonMax; b++ {
+			// if inpututil.IsGamepadButtonJustPressed(id, b) {
+			if inpututil.IsStandardGamepadButtonJustPressed(id, b) {
+				if b == ebiten.StandardGamepadButtonRightTop ||
+					b == ebiten.StandardGamepadButtonRightLeft ||
+					b == ebiten.StandardGamepadButtonRightRight ||
+					b == ebiten.StandardGamepadButtonRightBottom ||
+					b == ebiten.StandardGamepadButtonCenterRight {
+					return true
+				}
+			}
+		}
+	}
+	if MameKeys {
+		return ebiten.IsKeyPressed(ebiten.KeyControlLeft)
+	}
+	if ebiten.IsKeyPressed(ebiten.KeyAltRight) ||
+		ebiten.IsKeyPressed(ebiten.KeyControlRight) ||
+		ebiten.IsKeyPressed(ebiten.KeySpace) ||
+		ebiten.IsKeyPressed(ebiten.KeyAltLeft) ||
+		ebiten.IsKeyPressed(ebiten.KeyControlLeft) {
+		return true
+	}
+	return false
+
+}
+
+func IsP1UpPressed() bool {
+	return ebiten.IsKeyPressed(ebiten.KeyArrowUp)
+}
+
+func IsP1DownPressed() bool {
+	return ebiten.IsKeyPressed(ebiten.KeyArrowDown)
+}
+
+func IsP1LeftPressed() bool {
+	return ebiten.IsKeyPressed(ebiten.KeyArrowLeft)
+}
+
+func IsP1RightPressed() bool {
+	return ebiten.IsKeyPressed(ebiten.KeyArrowRight)
+}
+
+// P2
+func IsP2FireJustPressed() bool {
+	gamepadIDs := ebiten.GamepadIDs()
+	if len(gamepadIDs) >= 2 {
+		id := gamepadIDs[1]
+		for b := ebiten.StandardGamepadButton(0); b <= ebiten.StandardGamepadButtonMax; b++ {
+			if inpututil.IsStandardGamepadButtonJustPressed(id, b) {
+				if b == ebiten.StandardGamepadButtonRightTop ||
+					b == ebiten.StandardGamepadButtonRightLeft ||
+					b == ebiten.StandardGamepadButtonRightRight ||
+					b == ebiten.StandardGamepadButtonRightBottom ||
+					b == ebiten.StandardGamepadButtonCenterRight {
+					return true
+				}
+			}
+		}
+	}
+
+	if MameKeys {
+		return inpututil.IsKeyJustPressed(ebiten.KeyA)
+	}
+	return inpututil.IsKeyJustPressed(ebiten.KeyQ)
+}
+
+func IsP2FirePressed() bool {
+	gamepadIDs := ebiten.GamepadIDs()
+	if len(gamepadIDs) >= 2 {
+		id := gamepadIDs[1]
+		for b := ebiten.StandardGamepadButton(0); b <= ebiten.StandardGamepadButtonMax; b++ {
+			if inpututil.IsStandardGamepadButtonJustPressed(id, b) {
+				if b == ebiten.StandardGamepadButtonRightTop ||
+					b == ebiten.StandardGamepadButtonRightLeft ||
+					b == ebiten.StandardGamepadButtonRightRight ||
+					b == ebiten.StandardGamepadButtonRightBottom ||
+					b == ebiten.StandardGamepadButtonCenterRight {
+					return true
+				}
+			}
+		}
+	}
+
+	if MameKeys {
+		return ebiten.IsKeyPressed(ebiten.KeyA)
+	}
+	return ebiten.IsKeyPressed(ebiten.KeyQ)
+}
+
+func IsP2UpPressed() bool {
+	if MameKeys {
+		return ebiten.IsKeyPressed(ebiten.KeyR)
+	}
+	return ebiten.IsKeyPressed(ebiten.KeyW)
+}
+
+func IsP2DownPressed() bool {
+	if MameKeys {
+		return ebiten.IsKeyPressed(ebiten.KeyF)
+	}
+	return ebiten.IsKeyPressed(ebiten.KeyS)
+}
+
+func IsP2LeftPressed() bool {
+	if MameKeys {
+		return ebiten.IsKeyPressed(ebiten.KeyD)
+	}
+	return ebiten.IsKeyPressed(ebiten.KeyA)
+}
+
+func IsP2RightPressed() bool {
+	if MameKeys {
+		return ebiten.IsKeyPressed(ebiten.KeyG)
+	}
+	return ebiten.IsKeyPressed(ebiten.KeyD)
+}

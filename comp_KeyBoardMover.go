@@ -2,8 +2,9 @@ package main
 
 import "github.com/hajimehoshi/ebiten/v2"
 
+type IsKeyPressed func() bool
 type Keybinds struct {
-	Up, Down, Left, Right, Fire, Secondary ebiten.Key
+	Up, Down, Left, Right, Fire IsKeyPressed
 }
 
 type KeyBoardMover struct {
@@ -26,16 +27,16 @@ func (k *KeyBoardMover) Update() {
 	if !k.container.active || k.container.hit {
 		return
 	}
-	if ebiten.IsKeyPressed(k.Keybinds.Up) && k.container.position.y > 0 {
+	if k.Keybinds.Up() && k.container.position.y > 0 {
 		k.container.position.y -= k.speed.y
 	}
-	if ebiten.IsKeyPressed(k.Keybinds.Down) && k.container.position.y < screenHeight-spriteSize {
+	if k.Keybinds.Down() && k.container.position.y < screenHeight-spriteSize {
 		k.container.position.y += k.speed.y
 	}
-	if ebiten.IsKeyPressed(k.Keybinds.Left) && k.container.position.x > 0 {
+	if k.Keybinds.Left() && k.container.position.x > 0 {
 		k.container.position.x -= k.speed.x
 	}
-	if ebiten.IsKeyPressed(k.Keybinds.Right) && k.container.position.x < screenWidth-spriteSize {
+	if k.Keybinds.Right() && k.container.position.x < screenWidth-spriteSize {
 		k.container.position.x += k.speed.x
 	}
 }

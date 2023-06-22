@@ -9,13 +9,13 @@ import (
 type KeyboardShooter struct {
 	active      bool
 	container   *Entity
-	trigger     ebiten.Key
+	trigger     IsKeyPressed
 	bulletsPool []*Entity
 	cooldown    time.Duration
 	lastShot    time.Time
 }
 
-func NewKeyboardShooter(container *Entity, trigger ebiten.Key, bulletsPool []*Entity, cooldown time.Duration) *KeyboardShooter {
+func NewKeyboardShooter(container *Entity, trigger IsKeyPressed, bulletsPool []*Entity, cooldown time.Duration) *KeyboardShooter {
 	return &KeyboardShooter{
 		active:      true,
 		bulletsPool: bulletsPool,
@@ -30,7 +30,7 @@ func (ks *KeyboardShooter) Update() {
 	if !ks.container.active || ks.container.hit {
 		return
 	}
-	if ebiten.IsKeyPressed(ks.trigger) && time.Since(ks.lastShot) >= ks.cooldown {
+	if ks.trigger() && time.Since(ks.lastShot) >= ks.cooldown {
 		ks.shoot()
 	}
 	return

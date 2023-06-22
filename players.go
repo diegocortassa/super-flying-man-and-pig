@@ -3,7 +3,6 @@ package main
 import (
 	"time"
 
-	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/audio"
 )
 
@@ -30,14 +29,11 @@ func (g *Game) resetPlayerOne() {
 	g.playerOne.lives = 3
 
 	keyBinds := Keybinds{
-		Up:    ebiten.KeyArrowUp,
-		Down:  ebiten.KeyArrowDown,
-		Left:  ebiten.KeyArrowLeft,
-		Right: ebiten.KeyArrowRight,
-		Fire:  ebiten.KeyAltRight,
-	}
-	if MameKeys {
-		keyBinds.Fire = ebiten.KeyControlLeft
+		Up:    IsP1UpPressed,
+		Down:  IsP1DownPressed,
+		Left:  IsP1LeftPressed,
+		Right: IsP1RightPressed,
+		Fire:  IsP1FirePressed,
 	}
 	mover := NewKeyboardMover(g.playerOne, keyBinds, Vector{1, 1})
 	g.playerOne.addComponent(mover)
@@ -45,7 +41,7 @@ func (g *Game) resetPlayerOne() {
 	g.playerOneBullettPool = initBulletPool("P1Bullet", typePlayerOneBullet, animSuperFlyingManPew, ANIM_FPS, 5, Vector{0, -4}, Box{8, 2, 8, 8})
 	shooter := NewKeyboardShooter(
 		g.playerOne,
-		keyBinds.Fire,
+		IsP1FirePressed,
 		g.playerOneBullettPool,
 		time.Millisecond*250,
 	)
@@ -77,23 +73,12 @@ func (g *Game) resetPlayerTwo() {
 
 	g.playerTwo.lives = 3
 
-	var keyBinds = Keybinds{}
-	if MameKeys {
-		keyBinds = Keybinds{
-			Up:    ebiten.KeyR,
-			Down:  ebiten.KeyF,
-			Left:  ebiten.KeyD,
-			Right: ebiten.KeyG,
-			Fire:  ebiten.KeyA,
-		}
-	} else {
-		keyBinds = Keybinds{
-			Up:    ebiten.KeyW,
-			Down:  ebiten.KeyS,
-			Left:  ebiten.KeyA,
-			Right: ebiten.KeyD,
-			Fire:  ebiten.KeyQ,
-		}
+	keyBinds := Keybinds{
+		Up:    IsP2UpPressed,
+		Down:  IsP2DownPressed,
+		Left:  IsP2LeftPressed,
+		Right: IsP2RightPressed,
+		Fire:  IsP2FirePressed,
 	}
 	mover := NewKeyboardMover(g.playerTwo, keyBinds, Vector{1, 1})
 	g.playerTwo.addComponent(mover)
@@ -101,7 +86,7 @@ func (g *Game) resetPlayerTwo() {
 	g.playerTwoBullettPool = initBulletPool("P2Bullet", typePlayerTwoBullet, animPigPew, ANIM_FPS, 5, Vector{0, -4}, Box{8, 2, 8, 8})
 	shooter := NewKeyboardShooter(
 		g.playerTwo,
-		keyBinds.Fire,
+		IsP2FirePressed,
 		g.playerTwoBullettPool,
 		time.Millisecond*250,
 	)
