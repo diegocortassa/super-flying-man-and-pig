@@ -15,6 +15,7 @@ type TapeCommand struct {
 	arguments string
 }
 
+// Moves an entity Following a given script
 type ScriptedMover struct {
 	active     bool
 	container  *Entity
@@ -74,8 +75,8 @@ func (mover *ScriptedMover) Update() {
 	mover.container.position.y += mover.speed.y * math.Sin(rotationRad)
 
 	// entity out of screen
-	if mover.container.position.x > screenWidth+spriteSize || mover.container.position.x+spriteSize < 0 ||
-		mover.container.position.y > screenHeight+spriteSize || mover.container.position.y+spriteSize < 0 {
+	if mover.container.position.x > screenWidth || mover.container.position.x+spriteSize < 0 ||
+		mover.container.position.y > screenHeight || mover.container.position.y+spriteSize < 0 {
 		mover.container.active = false
 	}
 }
