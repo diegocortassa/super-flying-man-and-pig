@@ -17,10 +17,16 @@ func DrawTextByCenter(screen *ebiten.Image, msg string, font font.Face, cx, cy i
 	text.Draw(screen, msg, font, x, y, textColor)
 }
 
-// Draws text using it's center point as coordinates and a shadow
+// Draws text using it's center point as coordinates with a shadow
 func DrawTextWithShadowByCenter(screen *ebiten.Image, msg string, font font.Face, cx, cy int, textColor color.Color) {
 	bounds := text.BoundString(font, msg)
 	x, y := cx-bounds.Min.X-bounds.Dx()/2, cy-bounds.Min.Y-bounds.Dy()/2
+	text.Draw(screen, msg, arcadeFont, x+1, y+1, color.Black)
+	text.Draw(screen, msg, arcadeFont, x, y, textColor)
+}
+
+// Draws text with a shadow
+func DrawTextWithShadow(screen *ebiten.Image, msg string, font font.Face, x, y int, textColor color.Color) {
 	text.Draw(screen, msg, arcadeFont, x+1, y+1, color.Black)
 	text.Draw(screen, msg, arcadeFont, x, y, textColor)
 }
@@ -32,6 +38,7 @@ func DrawImageByCenter(screen *ebiten.Image, image *ebiten.Image, cx, cy int, op
 	screen.DrawImage(image, op)
 }
 
+// Calculate distance between two Entities
 func Distance(e1, e2 *Entity) float64 {
 	e1CenterX := e1.position.x + spriteSize/2
 	e1CenterY := e1.position.y + spriteSize/2

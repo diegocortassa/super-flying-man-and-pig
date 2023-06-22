@@ -2,12 +2,11 @@ package main
 
 import (
 	"fmt"
-	"image/color"
+	"strings"
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
-	"github.com/hajimehoshi/ebiten/v2/text"
 )
 
 func (g *Game) UpdateGameState() {
@@ -121,7 +120,8 @@ func (g *Game) DrawGameState(screen *ebiten.Image) {
 	var msg string
 
 	if g.playerOne.active {
-		msg = fmt.Sprintf("1UP %d\n%05d", g.playerOne.lives, g.playerOne.scores)
+		msg = fmt.Sprintf("1UP\n%05d", g.playerOne.scores)
+		DrawTextWithShadow(screen, strings.Repeat("*", g.playerOne.lives), arcadeFont, 10, screenHeight-10, ColorYellow)
 	} else {
 		if time.Now().Second()%2 == 0 {
 			msg = fmt.Sprintf("1UP\nPRESS FIRE")
@@ -129,15 +129,14 @@ func (g *Game) DrawGameState(screen *ebiten.Image) {
 			msg = fmt.Sprintf("1UP\n%05d", g.playerOne.scores)
 		}
 	}
-	text.Draw(screen, msg, arcadeFont, 6, 21, color.Black)
-	text.Draw(screen, msg, arcadeFont, 5, 20, ColorYellow)
+	DrawTextWithShadow(screen, msg, arcadeFont, 5, 20, ColorYellow)
 
 	msg = fmt.Sprintf("HI-SCORE\n  %05d", g.hiScores)
-	text.Draw(screen, msg, arcadeFont, 91, 21, color.Black)
-	text.Draw(screen, msg, arcadeFont, 90, 20, ColorYellow)
+	DrawTextWithShadow(screen, msg, arcadeFont, 90, 20, ColorYellow)
 
 	if g.playerTwo.active {
-		msg = fmt.Sprintf("2UP %d\n%05d", g.playerTwo.lives, g.playerTwo.scores)
+		msg = fmt.Sprintf("2UP\n%05d", g.playerTwo.scores)
+		DrawTextWithShadow(screen, strings.Repeat("*", g.playerTwo.lives), arcadeFont, screenWidth-30, screenHeight-10, ColorYellow)
 	} else {
 		if time.Now().Second()%2 == 0 {
 			msg = fmt.Sprintf("2UP\nPRESS FIRE")
@@ -145,8 +144,7 @@ func (g *Game) DrawGameState(screen *ebiten.Image) {
 			msg = fmt.Sprintf("2UP\n%05d", g.playerTwo.scores)
 		}
 	}
-	text.Draw(screen, msg, arcadeFont, 171, 21, color.Black)
-	text.Draw(screen, msg, arcadeFont, 170, 20, ColorYellow)
+	DrawTextWithShadow(screen, msg, arcadeFont, 170, 20, ColorYellow)
 
 	// Draw debug data
 	if debug {
