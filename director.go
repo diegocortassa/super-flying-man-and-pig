@@ -46,6 +46,20 @@ func (g *Game) UpdateDirector() {
 		}
 	}
 
+	if IsPauseJustPressed() {
+		if g.paused {
+			audioPlayerPlaying.Play()
+			g.paused = false
+		} else {
+			audioPlayerPlaying.Pause()
+			g.paused = true
+		}
+	}
+
+	if g.paused {
+		return
+	}
+
 	// At first init
 	if g.CurrentState == StateInit {
 		g.CurrentState = StateTitle

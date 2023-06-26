@@ -67,6 +67,13 @@ func IsResetJustPressed() bool {
 }
 
 func IsFullScreenJustPressed() bool {
+	if MameKeys {
+		return inpututil.IsKeyJustPressed(ebiten.KeyF2)
+	}
+	return inpututil.IsKeyJustPressed(ebiten.KeyF)
+}
+
+func IsPauseJustPressed() bool {
 	gamepadIDs := ebiten.GamepadIDs()
 
 	for i := 0; i < len(gamepadIDs); i++ {
@@ -79,12 +86,7 @@ func IsFullScreenJustPressed() bool {
 			}
 		}
 	}
-
-	if MameKeys {
-		return inpututil.IsKeyJustPressed(ebiten.KeyF2)
-	}
-
-	return inpututil.IsKeyJustPressed(ebiten.KeyF)
+	return inpututil.IsKeyJustPressed(ebiten.KeyP)
 }
 
 // - (not numeric keypad)

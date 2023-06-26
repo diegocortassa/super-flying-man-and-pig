@@ -64,8 +64,10 @@ var (
 type Game struct {
 	crtShader *ebiten.Shader
 	gameMap   []int // Tiled world map
-	position  int   // vertical position on screen map
-	hiScores  int
+
+	paused   bool // vertical position on screen map
+	position int  // vertical position on screen map
+	hiScores int
 
 	touchIDs   []ebiten.TouchID
 	gamepadIDs []ebiten.GamepadID
@@ -76,11 +78,11 @@ type Game struct {
 	playerTwoBullettPool []*Entity
 	enemies              []*Entity
 	enemiesBullettPool   []*Entity
-	lastEvent            time.Time
 
 	CurrentState        State     // the state/scene the game is currently playing
 	PreviousState       State     // the previous state/scene the game was
 	lastStateTransition time.Time // last time the state/scene was changed
+	lastEvent           time.Time
 
 	lastSpawn time.Time // last time an enemy was spawned
 	spawnHead int       // index on spawn script
@@ -111,6 +113,9 @@ func (g *Game) reset() {
 func (g *Game) Update() error {
 
 	g.UpdateDirector()
+	if g.paused {
+		return nil
+	}
 
 	switch g.CurrentState {
 	case StateTitle:
