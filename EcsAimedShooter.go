@@ -4,6 +4,7 @@ import (
 	"math"
 	"time"
 
+	"github.com/dcortassa/superflyingmanandpig/assets"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -30,8 +31,8 @@ func NewAimedShooter(container *Entity, trigger time.Duration, pool []*Entity, p
 }
 
 func (shooter *AimedShooter) Update() {
-	if time.Since(shooter.lastShot) >= shooter.trigger && !shooter.container.hit {
-		shooter.shoot(shooter.container.position.x+25, shooter.container.position.y-20)
+	if time.Since(shooter.lastShot) >= shooter.trigger && !shooter.container.Hit {
+		shooter.shoot(shooter.container.Position.X+25, shooter.container.Position.Y-20)
 		shooter.lastShot = time.Now()
 	}
 	return
@@ -45,27 +46,27 @@ func (shooter *AimedShooter) Draw(screen *ebiten.Image) {
 func (shooter *AimedShooter) shoot(x, y float64) {
 	if bul, ok := BullettFromPool(shooter.pool); ok {
 		// do not shoot while exploding
-		if shooter.container.exploding {
+		if shooter.container.Exploding {
 			return
 		}
 
-		mover := bul.getComponent(&ConstantMover{}).(*ConstantMover)
+		mover := bul.GetComponent(&ConstantMover{}).(*ConstantMover)
 
 		var px, py float64
-		distP1 := Distance(shooter.container, shooter.p1)
-		distP2 := Distance(shooter.container, shooter.p2)
+		distP1 := distance(shooter.container, shooter.p1)
+		distP2 := distance(shooter.container, shooter.p2)
 
 		// find nearest player
-		if !shooter.p2.active || distP1 < distP2 {
-			px = shooter.p1.position.x
-			py = shooter.p1.position.y
+		if !shooter.p2.Active || distP1 < distP2 {
+			px = shooter.p1.Position.X
+			py = shooter.p1.Position.Y
 		} else {
-			px = shooter.p2.position.x
-			py = shooter.p2.position.y
+			px = shooter.p2.Position.X
+			py = shooter.p2.Position.Y
 		}
 
-		sx := shooter.container.position.x
-		sy := shooter.container.position.y
+		sx := shooter.container.Position.X
+		sy := shooter.container.Position.Y
 
 		speed := 2.0
 
@@ -81,18 +82,31 @@ func (shooter *AimedShooter) shoot(x, y float64) {
 		mover.speed = Vector{speedX, speedY}
 
 		// play fire sound
-		sp := shooter.container.getComponent(&SoundPlayer{}).(*SoundPlayer)
+		sp := shooter.container.GetComponent(&SoundPlayer{}).(*SoundPlayer)
 		sp.PlaySound(SoundFire)
 		// shoot
-		bul.position.x = shooter.container.position.x
-		bul.position.y = shooter.container.position.y + spriteSize/2
+		bul.Position.X = shooter.container.Position.X
+		bul.Position.Y = shooter.container.Position.Y + assets.SpriteSize/2
 		// the enemy bullet pool is initialized with  speed Vector{0, 2}
 		// TODO the speed/direction could be changed with:
-		// mover := bul.getComponent(&aimedMover{}).(*aimedMover)
+		// mover := bul.GetComponent(&aimedMover{}).(*aimedMover)
 		// mover.speed = Vector{sx, sy}
-		bul.active = true
+		bul.Active = true
 		shooter.lastShot = time.Now()
 	}
 	return
 
+}
+
+// Calculate distance between two Entities
+func distance(e1, e2 *Entity) float64 {
+	e1CenterX := e1.Position.X + assets.SpriteSize/2
+	e1CenterY := e1.Position.Y + assets.SpriteSize/2
+	e2CenterX := e1.Position.X + assets.SpriteSize/2
+	e2CenterY := e1.Position.Y + assets.SpriteSize/2
+
+	dist := math.Sqrt(math.Pow(e1CenterX-e2CenterX, 2) +
+		math.Pow(e1CenterY-e2CenterY, 2))
+
+	return dist
 }

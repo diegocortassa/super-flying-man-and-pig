@@ -6,13 +6,16 @@ import (
 	"strings"
 	"time"
 
+	"github.com/dcortassa/superflyingmanandpig/assets"
+	"github.com/dcortassa/superflyingmanandpig/debug"
+	"github.com/dcortassa/superflyingmanandpig/globals"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
 type TapeCommand struct {
-	time      time.Duration
-	command   string
-	arguments string
+	Time      time.Duration
+	Command   string
+	Arguments string
 }
 
 // Moves an entity Following a given script
@@ -36,28 +39,28 @@ func NewScriptedMover(container *Entity, script []TapeCommand) *ScriptedMover {
 }
 
 func (mover *ScriptedMover) Update() {
-	if !mover.container.active || mover.container.hit {
+	if !mover.container.Active || mover.container.Hit {
 		return
 	}
 
 	// play script
 	c := mover.script[mover.head]
-	if time.Since(mover.lastUpdate) > c.time {
-		DebugPrintf(mover.container.name)
-		DebugPrintf("Command:", c)
+	if time.Since(mover.lastUpdate) > c.Time {
+		debug.DebugPrintf(mover.container.Name)
+		debug.DebugPrintf("Command:", c)
 
-		switch c.command {
+		switch c.Command {
 		case "speed":
-			splitted := strings.Fields(c.arguments)
+			splitted := strings.Fields(c.Arguments)
 			x, _ := strconv.ParseFloat(splitted[0], 64)
 			y, _ := strconv.ParseFloat(splitted[1], 64)
 			mover.speed = Vector{x, y}
 		case "rotate":
-			rot, _ := strconv.ParseFloat(c.arguments, 64)
-			mover.container.rotation = rot
+			rot, _ := strconv.ParseFloat(c.Arguments, 64)
+			mover.container.Rotation = rot
 		case "rotateAdd":
-			rot, _ := strconv.ParseFloat(c.arguments, 64)
-			mover.container.rotation += rot
+			rot, _ := strconv.ParseFloat(c.Arguments, 64)
+			mover.container.Rotation += rot
 		case "rewind":
 			mover.head = -1
 		case "wait":
@@ -70,14 +73,14 @@ func (mover *ScriptedMover) Update() {
 	}
 
 	// move using rotation
-	rotationRad := mover.container.rotation * (math.Pi / 180.0)
-	mover.container.position.x += mover.speed.x * math.Cos(rotationRad)
-	mover.container.position.y += mover.speed.y * math.Sin(rotationRad)
+	rotationRad := mover.container.Rotation * (math.Pi / 180.0)
+	mover.container.Position.X += mover.speed.X * math.Cos(rotationRad)
+	mover.container.Position.Y += mover.speed.Y * math.Sin(rotationRad)
 
 	// entity out of screen
-	if mover.container.position.x > screenWidth || mover.container.position.x+spriteSize < 0 ||
-		mover.container.position.y > screenHeight || mover.container.position.y+spriteSize < 0 {
-		mover.container.active = false
+	if mover.container.Position.X > globals.ScreenWidth || mover.container.Position.X+assets.SpriteSize < 0 ||
+		mover.container.Position.Y > globals.ScreenHeight || mover.container.Position.Y+assets.SpriteSize < 0 {
+		mover.container.Active = false
 	}
 }
 

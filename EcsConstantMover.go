@@ -1,6 +1,8 @@
 package main
 
 import (
+	"github.com/dcortassa/superflyingmanandpig/assets"
+	"github.com/dcortassa/superflyingmanandpig/globals"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -20,16 +22,16 @@ func NewConstantMover(container *Entity, speed Vector) *ConstantMover {
 }
 
 func (mover *ConstantMover) Update() {
-	if !mover.active || mover.container.hit {
+	if !mover.active || mover.container.Hit {
 		return
 	}
-	mover.container.position.x += mover.speed.x
-	mover.container.position.y += mover.speed.y
+	mover.container.Position.X += mover.speed.X
+	mover.container.Position.Y += mover.speed.Y
 
 	// entity out of screen
-	if mover.container.position.x > screenWidth || mover.container.position.x+spriteSize < 0 ||
-		mover.container.position.y > screenHeight || mover.container.position.y+spriteSize < 0 {
-		mover.container.active = false
+	if mover.container.Position.X > globals.ScreenWidth || mover.container.Position.X+assets.SpriteSize < 0 ||
+		mover.container.Position.Y > globals.ScreenHeight || mover.container.Position.Y+assets.SpriteSize < 0 {
+		mover.container.Active = false
 	}
 }
 

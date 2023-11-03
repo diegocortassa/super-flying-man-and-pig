@@ -20,7 +20,7 @@ type SoundPlayer struct {
 	currentSound Sound
 }
 
-func newSoundPlayer(container *Entity, sounds map[Sound]*audio.Player) *SoundPlayer {
+func NewSoundPlayer(container *Entity, sounds map[Sound]*audio.Player) *SoundPlayer {
 	var sp SoundPlayer
 
 	sp.container = container

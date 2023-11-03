@@ -3,6 +3,8 @@ package main
 import (
 	"time"
 
+	"github.com/dcortassa/superflyingmanandpig/assets"
+	"github.com/dcortassa/superflyingmanandpig/globals"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -37,7 +39,7 @@ func NewGamePadMover(container *Entity, gamePadNumber int, speed Vector, bullets
 }
 
 func (gp *GamePadMover) Update() {
-	if !gp.container.active || gp.container.hit {
+	if !gp.container.Active || gp.container.Hit {
 		return
 	}
 
@@ -66,20 +68,20 @@ func (gp *GamePadMover) Update() {
 				if ebiten.IsStandardGamepadButtonPressed(id, b) {
 					switch b {
 					case ebiten.StandardGamepadButtonLeftTop:
-						if gp.container.position.y > 0 {
-							gp.container.position.y -= gp.speed.y
+						if gp.container.Position.Y > 0 {
+							gp.container.Position.Y -= gp.speed.Y
 						}
 					case ebiten.StandardGamepadButtonLeftLeft:
-						if gp.container.position.x > 0 {
-							gp.container.position.x -= gp.speed.x
+						if gp.container.Position.X > 0 {
+							gp.container.Position.X -= gp.speed.X
 						}
 					case ebiten.StandardGamepadButtonLeftRight:
-						if gp.container.position.x < screenWidth-spriteSize {
-							gp.container.position.x += gp.speed.x
+						if gp.container.Position.X < globals.ScreenWidth-assets.SpriteSize {
+							gp.container.Position.X += gp.speed.X
 						}
 					case ebiten.StandardGamepadButtonLeftBottom:
-						if gp.container.position.y < screenHeight-spriteSize {
-							gp.container.position.y += gp.speed.y
+						if gp.container.Position.Y < globals.ScreenHeight-assets.SpriteSize {
+							gp.container.Position.Y += gp.speed.Y
 						}
 					case ebiten.StandardGamepadButtonRightTop,
 						ebiten.StandardGamepadButtonRightLeft,
@@ -105,9 +107,9 @@ func (gp *GamePadMover) Draw(screen *ebiten.Image) {
 
 func (gp *GamePadMover) shoot() {
 	if bul, ok := BullettFromPool(gp.bulletsPool); ok {
-		bul.active = true
-		bul.position.x = gp.container.position.x
-		bul.position.y = gp.container.position.y
+		bul.Active = true
+		bul.Position.X = gp.container.Position.X
+		bul.Position.Y = gp.container.Position.Y
 		// bul.rotation = 270 * (math.Pi / 180)
 		gp.lastShot = time.Now()
 	}

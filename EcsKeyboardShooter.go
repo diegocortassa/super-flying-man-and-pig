@@ -27,7 +27,7 @@ func NewKeyboardShooter(container *Entity, trigger IsKeyPressed, bulletsPool []*
 }
 
 func (ks *KeyboardShooter) Update() {
-	if !ks.container.active || ks.container.hit {
+	if !ks.container.Active || ks.container.Hit {
 		return
 	}
 	if ks.trigger() && time.Since(ks.lastShot) >= ks.cooldown {
@@ -43,12 +43,12 @@ func (ks *KeyboardShooter) Draw(screen *ebiten.Image) {
 func (ks *KeyboardShooter) shoot() {
 	if bul, ok := BullettFromPool(ks.bulletsPool); ok {
 		// Play fire sound
-		sp := ks.container.getComponent(&SoundPlayer{}).(*SoundPlayer)
+		sp := ks.container.GetComponent(&SoundPlayer{}).(*SoundPlayer)
 		sp.PlaySound(SoundFire)
 		// shoot
-		bul.position.x = ks.container.position.x
-		bul.position.y = ks.container.position.y
-		bul.active = true
+		bul.Position.X = ks.container.Position.X
+		bul.Position.Y = ks.container.Position.Y
+		bul.Active = true
 		// bul.rotation = 270 * (math.Pi / 180)
 		ks.lastShot = time.Now()
 	}

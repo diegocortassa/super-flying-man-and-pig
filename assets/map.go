@@ -1,8 +1,8 @@
-package main
+package assets
 
 import "image"
 
-var gameMap = []int{
+var GameMap = []int{
 	0, 1, 0, 1, 1, 0, 1, 1,
 	1, 0, 1, 0, 1, 0, 1, 0,
 	0, 1, 0, 1, 1, 1, 0, 1,
@@ -276,6 +276,6 @@ var gameMap = []int{
 	0, 1, 0, 1, 0, 1, 0, 1,
 }
 
-func getTile(tileIndex int) image.Image {
-	return tilesImage.SubImage(image.Rect(tileSize*(tileIndex), 0, tileSize*(tileIndex+1), tileSize))
+func GetTile(tileIndex int) image.Image {
+	return tilesImage.SubImage(image.Rect(TileSize*(tileIndex), 0, TileSize*(tileIndex+1), TileSize))
 }
