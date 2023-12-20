@@ -92,6 +92,11 @@ var (
 	sfx_wpn_laser8_wav   []byte
 	Sfx_wpn_laser8Player *audio.Player
 
+	// Vulcano fire
+	//go:embed audio/sfx_exp_short_hard2.wav
+	sfx_exp_short_hard2_wav   []byte
+	Sfx_exp_short_hard2Player *audio.Player
+
 	// Explosion
 	//go:embed audio/sfx_exp_odd1.wav
 	sfx_exp_odd1_wav   []byte
@@ -128,7 +133,7 @@ var (
 	AnimEnemyFlyingMan2 = []int{66, 67, 68, 69, 70, 70, 68, 67}                 // EnemyFlyingMan2
 	AnimEnemyThing      = []int{50, 51, 52, 53, 52, 51, 50}                     // EnemyThing
 	AnimEnemyCat        = []int{54, 55, 56, 57, 56, 55, 54}                     // EnemyCat
-
+	AnimEnemyVulcano    = []int{200, 71, 72, 73, 72, 71}                        // EnemyVulcano
 )
 
 func InitAssets() {
@@ -212,6 +217,10 @@ func InitSounds() {
 
 	Sfx_wpn_laser8Player = loadWavSound(sfx_wpn_laser8_wav, false)
 	Sfx_wpn_laser8Player.SetVolume(SoundVolume)
+
+	Sfx_exp_short_hard2Player = loadWavSound(sfx_exp_short_hard2_wav, false)
+	Sfx_exp_short_hard2Player.SetVolume(SoundVolume)
+
 }
 
 func loadMp3Sound(contents []byte, loop bool) *audio.Player {
