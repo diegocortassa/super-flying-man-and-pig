@@ -14,7 +14,6 @@ type SpawnCommand struct {
 	Position int
 	Command  string
 	X        float64
-	Y        float64
 }
 
 func SpawnEnemies(g *Game) {
@@ -29,9 +28,6 @@ func SpawnEnemies(g *Game) {
 	} else {
 		c.X = c.X - assets.SpriteSize/2 // position by sprite center
 	}
-	if c.Y == -1 {
-		c.Y = -assets.SpriteSize
-	}
 
 	// If the game position is ahead of spawnHead skip passed positions
 	if g.Position > c.Position-globals.ScreenHeight-assets.SpriteSize/2 && g.spawnHead < len(spawnScript)-1 {
@@ -44,15 +40,15 @@ func SpawnEnemies(g *Game) {
 		case "Baloon":
 			spawnBaloon(g, globals.ScreenWidth/2, -assets.SpriteSize, speed)
 		case "Thing":
-			spawnThing(g, c.X, c.Y, speed)
+			spawnThing(g, c.X, -assets.SpriteSize, speed)
 		case "FlyingMan1":
-			spawnFlyingMan1(g, c.X, c.Y, speed)
+			spawnFlyingMan1(g, c.X, -assets.SpriteSize, speed)
 		case "FlyingMan2":
-			spawnFlyingMan2(g, c.X, c.Y, speed)
+			spawnFlyingMan2(g, c.X, -assets.SpriteSize, speed)
 		case "Cat":
-			spawnCat(g, c.X, c.Y, speed)
+			spawnCat(g, c.X, -assets.SpriteSize, speed)
 		case "Vulcano":
-			spawnVulcano(g, c.X, c.Y, Vector{X: 0.0, Y: 0.5})
+			spawnVulcano(g, c.X, -assets.SpriteSize, Vector{X: 0.0, Y: 0.5})
 		}
 
 		if g.spawnHead < len(spawnScript)-1 {
