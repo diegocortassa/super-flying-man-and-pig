@@ -5,6 +5,7 @@
 *.tar.gz
 .idea
 .vscode
+.cache
 
 scratch
 build
