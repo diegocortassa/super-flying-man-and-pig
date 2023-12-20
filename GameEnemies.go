@@ -11,34 +11,48 @@ import (
 )
 
 type SpawnCommand struct {
-	Position  int
-	Command   string
-	Arguments string
+	Position int
+	Command  string
+	X        float64
+	Y        float64
 }
 
 func SpawnEnemies(g *Game) {
 
-	positionOffset := 0
 	speed := Vector{X: rand.Float64()*2.0 - 1.0, Y: rand.Float64()}
 	min := 50.0
 	max := globals.ScreenWidth - 50.0
-	x := rand.Float64()*(max-min) + min
 
 	c := spawnScript[g.spawnHead]
+	if c.X == -1 {
+		c.X = rand.Float64()*(max-min) + min
+	} else {
+		c.X = c.X - assets.SpriteSize/2 // position by sprite center
+	}
+	if c.Y == -1 {
+		c.Y = -assets.SpriteSize
+	}
 
-	if g.Position == c.Position+positionOffset { // Position based spawn
+	// If the game position is ahead of spawnHead skip passed positions
+	if g.Position > c.Position-globals.ScreenHeight-assets.SpriteSize/2 && g.spawnHead < len(spawnScript)-1 {
+		g.spawnHead++
+	}
+
+	if g.Position == c.Position-globals.ScreenHeight-assets.SpriteSize/2 { // Position based spawn
 		debug.DebugPrintf("*** Spawn Command:", c)
 		switch c.Command {
 		case "Baloon":
 			spawnBaloon(g, globals.ScreenWidth/2, -assets.SpriteSize, speed)
 		case "Thing":
-			spawnThing(g, x, -assets.SpriteSize, speed)
+			spawnThing(g, c.X, c.Y, speed)
 		case "FlyingMan1":
-			spawnFlyingMan1(g, x, -assets.SpriteSize, speed)
+			spawnFlyingMan1(g, c.X, c.Y, speed)
 		case "FlyingMan2":
-			spawnFlyingMan2(g, x, -assets.SpriteSize, speed)
+			spawnFlyingMan2(g, c.X, c.Y, speed)
 		case "Cat":
-			spawnCat(g, x, -assets.SpriteSize, speed)
+			spawnCat(g, c.X, c.Y, speed)
+		case "Vulcano":
+			spawnVulcano(g, c.X, c.Y, Vector{X: 0.0, Y: 0.5})
 		}
 
 		if g.spawnHead < len(spawnScript)-1 {
@@ -265,6 +279,43 @@ func spawnCat(g *Game, x, y float64, speed Vector) {
 		g.enemiesBullettPool,
 	)
 	enemy.AddComponent(cshooter)
+
+	g.enemies = append(g.enemies, enemy)
+}
+
+// Vulcano
+func spawnVulcano(g *Game, x float64, y float64, speed Vector) {
+	enemy := NewEntity(
+		"Vulcano",
+		Vector{X: x, Y: y},
+	)
+	enemy.EntityType = TypeEnemy
+	enemy.ScoreValue = 500
+	// No hitbox, vulcanos are indestructible
+	// enemy.HitBoxes = append(enemy.HitBoxes, Box{X: 10, Y: 10, W: 0, H: 0})
+
+	sequences := map[string]*Sequence{
+		"idle":    NewSequence(assets.AnimEnemyVulcano, assets.AnimFPS, true),
+		"destroy": NewSequence(assets.AnimExplosion, assets.AnimFPS, false),
+	}
+	animator := NewAnimator(enemy, sequences, "idle")
+	enemy.AddComponent(animator)
+
+	sounds := map[Sound]*audio.Player{SoundDestroy: assets.Sfx_exp_odd1Player, SoundFire: assets.Sfx_exp_short_hard2Player}
+	soundPlayer := NewSoundPlayer(enemy, sounds)
+	enemy.AddComponent(soundPlayer)
+
+	cmover := NewConstantMover(enemy, speed)
+	enemy.AddComponent(cmover)
+
+	rshooter := NewRotativeShooter(
+		enemy,
+		time.Millisecond*300,
+		180,
+		25,
+		g.enemiesBullettPool,
+	)
+	enemy.AddComponent(rshooter)
 
 	g.enemies = append(g.enemies, enemy)
 }
