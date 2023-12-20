@@ -10,62 +10,41 @@ import (
 	"github.com/hajimehoshi/ebiten/v2/audio"
 )
 
-var spawnScript = []TapeCommand{
-	{time.Millisecond * 1, "wait", ""},
-	{time.Millisecond * 500, "Baloon", "Baloon"},
-	{time.Millisecond * 500, "Baloon", "Baloon"},
-	{time.Millisecond * 500, "Baloon", "Baloon"},
-	{time.Millisecond * 500, "Baloon", "Baloon"},
-	{time.Millisecond * 2000, "Thing", ""},
-	{time.Millisecond * 1000, "Thing", ""},
-	{time.Millisecond * 1000, "Thing", ""},
-	{time.Millisecond * 1000, "Thing", ""},
-	{time.Millisecond * 4000, "FlyingMan1", ""},
-	{time.Millisecond * 300, "FlyingMan1", ""},
-	{time.Millisecond * 300, "FlyingMan1", ""},
-	{time.Millisecond * 300, "FlyingMan1", ""},
-	{time.Millisecond * 300, "FlyingMan1", ""},
-	{time.Millisecond * 300, "FlyingMan1", ""},
-	{time.Millisecond * 5000, "Cat", ""},
-	{time.Millisecond * 1000, "Cat", ""},
-	{time.Millisecond * 1000, "Cat", ""},
-	{time.Millisecond * 1000, "Cat", ""},
-	{time.Millisecond * 1000, "Cat", ""},
-	{time.Millisecond * 3000, "Baloon", "Baloon"},
-	{time.Millisecond * 500, "Baloon", "Baloon"},
-	{time.Millisecond * 500, "Baloon", "Baloon"},
-	{time.Millisecond * 500, "Baloon", "Baloon"},
-	{time.Millisecond * 500, "Baloon", "Baloon"},
-	{time.Millisecond * 4000, "FlyingMan2", "FlyingMan2"},
-	{time.Millisecond * 300, "FlyingMan2", "FlyingMan2"},
-	{time.Millisecond * 300, "FlyingMan2", "FlyingMan2"},
-	{time.Millisecond * 300, "FlyingMan2", "FlyingMan2"},
-	{time.Millisecond * 300, "FlyingMan2", "FlyingMan2"},
-	{time.Millisecond * 300, "FlyingMan2", "FlyingMan2"},
-	{time.Millisecond * 5000, "rewind", ""},
+type SpawnCommand struct {
+	Position  int
+	Command   string
+	Arguments string
 }
 
-var enemyRotateAndGo = []TapeCommand{
-	//     270
-	// 180     0
-	//     90
-	{time.Millisecond * 1, "rotate", "90"},
-	{time.Millisecond * 1000, "speed", "2 2"},
-	{time.Millisecond * 1500, "rotateAdd", "22"},
-	{time.Millisecond * 200, "rotateAdd", "22"},
-	{time.Millisecond * 200, "rotateAdd", "22"},
-	{time.Millisecond * 200, "rotateAdd", "22"},
-	{time.Millisecond * 200, "rotateAdd", "22"},
-	{time.Millisecond * 200, "rotateAdd", "22"},
-	{time.Millisecond * 200, "rotateAdd", "22"},
-	{time.Millisecond * 200, "rotateAdd", "22"},
-	{time.Millisecond * 200, "rotateAdd", "22"},
-	{time.Millisecond * 200, "rotateAdd", "22"},
-	{time.Millisecond * 200, "rotateAdd", "22"},
-	{time.Millisecond * 200, "rotateAdd", "22"},
-	{time.Millisecond * 200, "rotateAdd", "22"},
-	{time.Millisecond * 200, "rotateAdd", "22"},
-	{time.Millisecond * 200, "wait", ""},
+func SpawnEnemies(g *Game) {
+
+	positionOffset := 0
+	speed := Vector{X: rand.Float64()*2.0 - 1.0, Y: rand.Float64()}
+	min := 50.0
+	max := globals.ScreenWidth - 50.0
+	x := rand.Float64()*(max-min) + min
+
+	c := spawnScript[g.spawnHead]
+
+	if g.Position == c.Position+positionOffset { // Position based spawn
+		debug.DebugPrintf("*** Spawn Command:", c)
+		switch c.Command {
+		case "Baloon":
+			spawnBaloon(g, globals.ScreenWidth/2, -assets.SpriteSize, speed)
+		case "Thing":
+			spawnThing(g, x, -assets.SpriteSize, speed)
+		case "FlyingMan1":
+			spawnFlyingMan1(g, x, -assets.SpriteSize, speed)
+		case "FlyingMan2":
+			spawnFlyingMan2(g, x, -assets.SpriteSize, speed)
+		case "Cat":
+			spawnCat(g, x, -assets.SpriteSize, speed)
+		}
+
+		if g.spawnHead < len(spawnScript)-1 {
+			g.spawnHead++
+		}
+	}
 }
 
 func CleanEnemyList(g *Game) {
@@ -80,6 +59,9 @@ func CleanEnemyList(g *Game) {
 	}
 }
 
+// Specific enemy spawn functions
+
+// Baloon
 func spawnBaloon(g *Game, x, y float64, speed Vector) {
 	enemy := NewEntity(
 		"Baloon",
@@ -105,6 +87,7 @@ func spawnBaloon(g *Game, x, y float64, speed Vector) {
 	g.enemies = append(g.enemies, enemy)
 }
 
+// Thing
 func spawnThing(g *Game, x, y float64, speed Vector) {
 	enemy := NewEntity(
 		"Thing",
@@ -130,7 +113,32 @@ func spawnThing(g *Game, x, y float64, speed Vector) {
 	g.enemies = append(g.enemies, enemy)
 }
 
+// Flying man 1
 func spawnFlyingMan1(g *Game, x, y float64, speed Vector) {
+
+	var enemyRotateAndGo = []TimedCommand{
+		//     270
+		// 180     0
+		//     90
+		{time.Millisecond * 1, "rotate", "90"},
+		{time.Millisecond * 1000, "speed", "2 2"},
+		{time.Millisecond * 1500, "rotateAdd", "22"},
+		{time.Millisecond * 200, "rotateAdd", "22"},
+		{time.Millisecond * 200, "rotateAdd", "22"},
+		{time.Millisecond * 200, "rotateAdd", "22"},
+		{time.Millisecond * 200, "rotateAdd", "22"},
+		{time.Millisecond * 200, "rotateAdd", "22"},
+		{time.Millisecond * 200, "rotateAdd", "22"},
+		{time.Millisecond * 200, "rotateAdd", "22"},
+		{time.Millisecond * 200, "rotateAdd", "22"},
+		{time.Millisecond * 200, "rotateAdd", "22"},
+		{time.Millisecond * 200, "rotateAdd", "22"},
+		{time.Millisecond * 200, "rotateAdd", "22"},
+		{time.Millisecond * 200, "rotateAdd", "22"},
+		{time.Millisecond * 200, "rotateAdd", "22"},
+		{time.Millisecond * 200, "wait", ""},
+	}
+
 	enemy := NewEntity(
 		"FlyingMan1",
 		Vector{X: x, Y: y},
@@ -166,7 +174,32 @@ func spawnFlyingMan1(g *Game, x, y float64, speed Vector) {
 	g.enemies = append(g.enemies, enemy)
 }
 
+// Flying man 2
 func spawnFlyingMan2(g *Game, x, y float64, speed Vector) {
+
+	var enemyRotateAndGo = []TimedCommand{
+		//     270
+		// 180     0
+		//     90
+		{time.Millisecond * 1, "rotate", "90"},
+		{time.Millisecond * 1000, "speed", "2 2"},
+		{time.Millisecond * 1500, "rotateAdd", "22"},
+		{time.Millisecond * 200, "rotateAdd", "22"},
+		{time.Millisecond * 200, "rotateAdd", "22"},
+		{time.Millisecond * 200, "rotateAdd", "22"},
+		{time.Millisecond * 200, "rotateAdd", "22"},
+		{time.Millisecond * 200, "rotateAdd", "22"},
+		{time.Millisecond * 200, "rotateAdd", "22"},
+		{time.Millisecond * 200, "rotateAdd", "22"},
+		{time.Millisecond * 200, "rotateAdd", "22"},
+		{time.Millisecond * 200, "rotateAdd", "22"},
+		{time.Millisecond * 200, "rotateAdd", "22"},
+		{time.Millisecond * 200, "rotateAdd", "22"},
+		{time.Millisecond * 200, "rotateAdd", "22"},
+		{time.Millisecond * 200, "rotateAdd", "22"},
+		{time.Millisecond * 200, "wait", ""},
+	}
+
 	enemy := NewEntity(
 		"FlyingMan2",
 		Vector{X: globals.ScreenWidth / 2, Y: -assets.SpriteSize},
@@ -202,6 +235,7 @@ func spawnFlyingMan2(g *Game, x, y float64, speed Vector) {
 	g.enemies = append(g.enemies, enemy)
 }
 
+// Cat
 func spawnCat(g *Game, x, y float64, speed Vector) {
 	enemy := NewEntity(
 		"Cat",
@@ -233,56 +267,4 @@ func spawnCat(g *Game, x, y float64, speed Vector) {
 	enemy.AddComponent(cshooter)
 
 	g.enemies = append(g.enemies, enemy)
-}
-
-func SpawnEnemies(g *Game) {
-
-	speed := Vector{X: rand.Float64()*2.0 - 1.0, Y: rand.Float64()}
-	min := 50.0
-	max := globals.ScreenWidth - 50.0
-	x := rand.Float64()*(max-min) + min
-
-	c := spawnScript[g.spawnHead]
-	debug.DebugPrintf("time.Since(lastSpawn):", time.Since(g.lastSpawn), "spawnHead:", g.spawnHead)
-	if time.Since(g.lastSpawn) > c.Time {
-		debug.DebugPrintf("Spawn Command:", c)
-		switch c.Command {
-		case "Baloon":
-			spawnBaloon(g, globals.ScreenWidth/2, -assets.SpriteSize, speed)
-		case "Thing":
-			spawnThing(g, x, -assets.SpriteSize, speed)
-		case "FlyingMan1":
-			spawnFlyingMan1(g, x, -assets.SpriteSize, speed)
-		case "FlyingMan2":
-			spawnFlyingMan2(g, x, -assets.SpriteSize, speed)
-		case "Cat":
-			spawnCat(g, x, -assets.SpriteSize, speed)
-		case "wait":
-		case "rewind":
-			g.spawnHead = -1
-		}
-
-		g.lastSpawn = time.Now()
-		if g.spawnHead < len(spawnScript)-1 {
-			g.spawnHead++
-		}
-	}
-
-	// Old pseudo random spawning
-	// if g.Position%96 == 0 {
-	// 	// spawnBaloon(g, x, -assets.SpriteSize, speed)
-	// 	spawnBaloon(g, screenWidth/2, -assets.SpriteSize, speed)
-	// }
-	// if g.Position%108 == 0 {
-	// 	spawnThing(g, x, -assets.SpriteSize, speed)
-
-	// }
-	// if g.Position%141 == 0 {
-	// 	// Enemies
-	// 	spawnFlyingMan1(g, x, -assets.SpriteSize, speed)
-
-	// }
-	// if g.Position%303 == 0 {
-	// 	spawnCat(g, x, -assets.SpriteSize, speed)
-	// }
 }

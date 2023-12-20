@@ -12,7 +12,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-type TapeCommand struct {
+type TimedCommand struct {
 	Time      time.Duration
 	Command   string
 	Arguments string
@@ -25,10 +25,10 @@ type ScriptedMover struct {
 	speed      Vector
 	lastUpdate time.Time
 	head       int
-	script     []TapeCommand
+	script     []TimedCommand
 }
 
-func NewScriptedMover(container *Entity, script []TapeCommand) *ScriptedMover {
+func NewScriptedMover(container *Entity, script []TimedCommand) *ScriptedMover {
 	return &ScriptedMover{
 		active:    true,
 		container: container,
@@ -51,9 +51,9 @@ func (mover *ScriptedMover) Update() {
 
 		switch c.Command {
 		case "speed":
-			splitted := strings.Fields(c.Arguments)
-			x, _ := strconv.ParseFloat(splitted[0], 64)
-			y, _ := strconv.ParseFloat(splitted[1], 64)
+			splitField := strings.Fields(c.Arguments)
+			x, _ := strconv.ParseFloat(splitField[0], 64)
+			y, _ := strconv.ParseFloat(splitField[1], 64)
 			mover.speed = Vector{x, y}
 		case "rotate":
 			rot, _ := strconv.ParseFloat(c.Arguments, 64)
