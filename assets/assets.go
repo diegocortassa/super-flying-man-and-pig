@@ -92,7 +92,7 @@ var (
 	sfx_wpn_laser8_wav   []byte
 	Sfx_wpn_laser8Player *audio.Player
 
-	// Vulcano fire
+	// Volcano fire
 	//go:embed audio/sfx_exp_short_hard2.wav
 	sfx_exp_short_hard2_wav   []byte
 	Sfx_exp_short_hard2Player *audio.Player
@@ -133,7 +133,7 @@ var (
 	AnimEnemyFlyingMan2 = []int{66, 67, 68, 69, 70, 70, 68, 67}                 // EnemyFlyingMan2
 	AnimEnemyThing      = []int{50, 51, 52, 53, 52, 51, 50}                     // EnemyThing
 	AnimEnemyCat        = []int{54, 55, 56, 57, 56, 55, 54}                     // EnemyCat
-	AnimEnemyVulcano    = []int{200, 71, 72, 73, 72, 71}                        // EnemyVulcano
+	AnimEnemyVolcano    = []int{200, 71, 72, 73, 72, 71}                        // EnemyVolcano
 )
 
 func InitAssets() {

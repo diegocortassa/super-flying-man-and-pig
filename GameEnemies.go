@@ -47,8 +47,8 @@ func SpawnEnemies(g *Game) {
 			spawnFlyingMan2(g, c.X, -assets.SpriteSize, speed)
 		case "Cat":
 			spawnCat(g, c.X, -assets.SpriteSize, speed)
-		case "Vulcano":
-			spawnVulcano(g, c.X, -assets.SpriteSize, Vector{X: 0.0, Y: 0.5})
+		case "Volcano":
+			spawnVolcano(g, c.X, -assets.SpriteSize, Vector{X: 0.0, Y: 0.498}) // 4 va su, 6 va giu
 		}
 
 		if g.spawnHead < len(spawnScript)-1 {
@@ -279,19 +279,19 @@ func spawnCat(g *Game, x, y float64, speed Vector) {
 	g.enemies = append(g.enemies, enemy)
 }
 
-// Vulcano
-func spawnVulcano(g *Game, x float64, y float64, speed Vector) {
+// Volcano
+func spawnVolcano(g *Game, x float64, y float64, speed Vector) {
 	enemy := NewEntity(
-		"Vulcano",
+		"Volcano",
 		Vector{X: x, Y: y},
 	)
 	enemy.EntityType = TypeEnemy
 	enemy.ScoreValue = 500
-	// No hitbox, vulcanos are indestructible
+	// No hitbox, Volcanoes are indestructible
 	// enemy.HitBoxes = append(enemy.HitBoxes, Box{X: 10, Y: 10, W: 0, H: 0})
 
 	sequences := map[string]*Sequence{
-		"idle":    NewSequence(assets.AnimEnemyVulcano, assets.AnimFPS, true),
+		"idle":    NewSequence(assets.AnimEnemyVolcano, assets.AnimFPS, true),
 		"destroy": NewSequence(assets.AnimExplosion, assets.AnimFPS, false),
 	}
 	animator := NewAnimator(enemy, sequences, "idle")

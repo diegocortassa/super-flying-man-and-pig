@@ -53,7 +53,7 @@ func (shooter *RotativeShooter) shoot(x, y float64) {
 		sp.PlaySound(SoundFire)
 		// shoot
 		bul.Position.X = shooter.container.Position.X
-		// This is used by vulcanos the bullet origins at sprite center
+		// This is used by volcanoes the bullet origins at sprite center
 		// bul.Position.Y = shooter.container.Position.Y + assets.SpriteSize/2
 		bul.Position.Y = shooter.container.Position.Y
 

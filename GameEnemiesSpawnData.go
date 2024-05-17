@@ -1,6 +1,7 @@
 package main
 
 var spawnScript = []SpawnCommand{
+	// Vertical position trigger, Enemy type, start x position
 	{410, "Baloon", -1},
 	{425, "Baloon", -1},
 	{440, "Baloon", -1},
@@ -31,7 +32,7 @@ var spawnScript = []SpawnCommand{
 	{1420, "FlyingMan2", -1},
 	{1435, "FlyingMan2", -1},
 	{1450, "FlyingMan2", -1},
-	{2464, "Vulcano", 128},
-	{3296, "Vulcano", 63},
-	{3520, "Vulcano", 191},
+	{2464, "Volcano", 128},
+	{3296, "Volcano", 63},
+	{3520, "Volcano", 191},
 }
