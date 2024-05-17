@@ -1,4 +1,4 @@
-module github.com/dcortassa/superflyingmanandpig
+module github.com/dcortassa/super-flying-man-and-pig
 
 go 1.20
 

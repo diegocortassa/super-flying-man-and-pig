@@ -4,8 +4,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/dcortassa/superflyingmanandpig/assets"
-	"github.com/dcortassa/superflyingmanandpig/input"
+	"github.com/dcortassa/super-flying-man-and-pig/assets"
+	"github.com/dcortassa/super-flying-man-and-pig/input"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 

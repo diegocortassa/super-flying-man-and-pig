@@ -4,8 +4,8 @@ import (
 	_ "embed"
 	"image/color"
 
-	"github.com/dcortassa/superflyingmanandpig/assets"
-	"github.com/dcortassa/superflyingmanandpig/globals"
+	"github.com/dcortassa/super-flying-man-and-pig/assets"
+	"github.com/dcortassa/super-flying-man-and-pig/globals"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
