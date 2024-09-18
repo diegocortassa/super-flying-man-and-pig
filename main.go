@@ -4,6 +4,7 @@ import (
 	"bytes"
 	_ "embed"
 	"flag"
+	"fmt"
 	"image"
 	_ "image/png"
 	"log"
@@ -20,7 +21,9 @@ const (
 )
 
 var (
-	fullScreen bool
+	fullScreen    bool
+	startAt       string
+	startPosition int
 )
 
 func main() {
@@ -29,6 +32,7 @@ func main() {
 	flag.BoolVar(&globals.MameKeys, "mamekeys", false, "Use MAME compatible key mapping")
 	flag.BoolVar(&FlagCRT, "crt", false, "enable the CRT simulation")
 	flag.BoolVar(&globals.Debug, "debug", false, "enable debug")
+	flag.StringVar(&startAt, "startat", "Beach", "Start at coordinates Beach, Clouds, Desert, Forest or Castle")
 	flag.Float64Var(&assets.SoundVolume, "soundvolume", assets.DefaultSoundVolume*10, "Set sound volume 0 to 10")
 	flag.Parse()
 
@@ -43,7 +47,28 @@ func main() {
 	assets.InitAssets()
 	assets.InitSounds()
 
-	g := NewGame(FlagCRT)
+	switch startAt {
+	case "Beach":
+		fmt.Println("Starting at Beach")
+		startPosition = globals.Beach
+	case "Clouds":
+		fmt.Println("Starting at Clouds")
+		startPosition = globals.Clouds
+	case "Desert":
+		fmt.Println("Starting at Desert")
+		startPosition = globals.Desert
+	case "Forest":
+		fmt.Println("Starting at Forest")
+		startPosition = globals.Forest
+	case "Castle":
+		fmt.Println("Starting at Castle")
+		startPosition = globals.Castle
+	default:
+		fmt.Printf("Starting at Beach")
+		startPosition = globals.Beach
+	}
+
+	g := NewGame(FlagCRT, startPosition)
 
 	ebiten.SetWindowSize(globals.ScreenWidth*zoom, globals.ScreenHeight*zoom)
 	ebiten.SetWindowTitle("Super flying man and Pig")

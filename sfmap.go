@@ -38,15 +38,10 @@ var (
 
 // Game controls overall gameplay.
 type Game struct {
-	crtShader *ebiten.Shader
-	gameMap   []int // Tiled world map
-
-	paused   bool // vertical position on screen map
-	Position int  // vertical position on screen map
-	HiScores int
-
-	touchIDs   []ebiten.TouchID
-	gamepadIDs []ebiten.GamepadID
+	paused        bool // vertical position on screen map
+	Position      int  // vertical position on screen map
+	StartPosition int
+	HiScores      int
 
 	playerOne            *Entity
 	playerTwo            *Entity
@@ -77,9 +72,7 @@ func (g *Game) init() {
 }
 
 func (g *Game) reset() {
-	// DEBUG start at castle
-	g.Position = 7600
-	g.Position = 0
+	g.Position = g.StartPosition
 	// Enemies
 	g.enemies = nil
 	// Enemies Bullets
@@ -164,7 +157,7 @@ func (g *GameWithCRTEffect) DrawFinalScreen(screen ebiten.FinalScreen, offscreen
 	if g.crtShader == nil {
 		s, err := ebiten.NewShader(crtGo)
 		if err != nil {
-			panic(fmt.Sprintf("failed to compiled the CRT shader: %v", err))
+			panic(fmt.Sprintf("failed to compile the CRT shader: %v", err))
 		}
 		g.crtShader = s
 	}
@@ -181,8 +174,9 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	return globals.ScreenWidth, globals.ScreenHeight
 }
 
-func NewGame(flagCRT bool) ebiten.Game {
+func NewGame(flagCRT bool, startPosition int) ebiten.Game {
 	g := &Game{}
+	g.StartPosition = startPosition
 	g.init()
 	if flagCRT {
 		return &GameWithCRTEffect{Game: g}
