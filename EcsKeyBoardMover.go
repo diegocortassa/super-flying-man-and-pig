@@ -46,5 +46,5 @@ func (k *KeyBoardMover) Update() {
 }
 
 func (k *KeyBoardMover) Draw(screen *ebiten.Image) {
-	return
+	// mover doesn't need to be drawn
 }

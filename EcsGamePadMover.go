@@ -102,7 +102,7 @@ func (gp *GamePadMover) Update() {
 }
 
 func (gp *GamePadMover) Draw(screen *ebiten.Image) {
-	return
+	// mover doesn't need to be drawn
 }
 
 func (gp *GamePadMover) shoot() {
@@ -113,6 +113,4 @@ func (gp *GamePadMover) shoot() {
 		// bul.rotation = 270 * (math.Pi / 180)
 		gp.lastShot = time.Now()
 	}
-	return
-
 }

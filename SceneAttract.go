@@ -105,9 +105,9 @@ func (g *Game) DrawAttractState(screen *ebiten.Image) {
 	var msg string
 
 	if time.Now().Second()%2 == 0 {
-		msg = fmt.Sprintf("1UP\nPRESS FIRE")
+		msg = "1UP\nPRESS FIRE"
 	} else {
-		msg = fmt.Sprintf("1UP")
+		msg = "1UP"
 	}
 	text.Draw(screen, msg, assets.ArcadeFont, 6, 21, assets.ColorBlack)
 	text.Draw(screen, msg, assets.ArcadeFont, 5, 20, assets.ColorYellow)
@@ -117,9 +117,9 @@ func (g *Game) DrawAttractState(screen *ebiten.Image) {
 	text.Draw(screen, msg, assets.ArcadeFont, 90, 20, assets.ColorYellow)
 
 	if time.Now().Second()%2 == 0 {
-		msg = fmt.Sprintf("2UP\nPRESS FIRE")
+		msg = "2UP\nPRESS FIRE"
 	} else {
-		msg = fmt.Sprintf("2UP")
+		msg = "2UP"
 	}
 	text.Draw(screen, msg, assets.ArcadeFont, 171, 21, assets.ColorBlack)
 	text.Draw(screen, msg, assets.ArcadeFont, 170, 20, assets.ColorYellow)

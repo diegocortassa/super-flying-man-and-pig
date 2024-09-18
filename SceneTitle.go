@@ -9,8 +9,6 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-const freePlayBlinkTime = time.Millisecond * 500 // "free play" message blink time
-
 func (g *Game) UpdateTileState() {
 	// TBD
 }

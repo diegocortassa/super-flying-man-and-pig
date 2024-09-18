@@ -36,5 +36,5 @@ func (mover *ConstantMover) Update() {
 }
 
 func (k *ConstantMover) Draw(screen *ebiten.Image) {
-	return
+	// mover doesn't need to be drawn
 }

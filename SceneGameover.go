@@ -17,7 +17,7 @@ func (g *Game) UpdateGameOverState() {
 
 func (g *Game) DrawGameOverState(screen *ebiten.Image) {
 	var msg string
-	msg = fmt.Sprintf("GAME OVER")
+	msg = "GAME OVER"
 	DrawTextByCenter(screen, msg, assets.ArcadeFont, globals.ScreenWidth/2, globals.ScreenHeight/2, assets.ColorRed)
 
 	// if time.Now().Second()%2 == 0 {

@@ -30,11 +30,10 @@ func (shooter *ConstantShooter) Update() {
 		shooter.shoot(shooter.container.Position.X+25, shooter.container.Position.Y-20)
 		shooter.lastShot = time.Now()
 	}
-	return
 }
 
 func (shooter *ConstantShooter) Draw(screen *ebiten.Image) {
-	return
+	// shooter doesn't need to be drawn
 }
 
 // Shoot bullet from pool starting at position x,y
@@ -57,6 +56,4 @@ func (shooter *ConstantShooter) shoot(x, y float64) {
 		bul.Active = true
 		shooter.lastShot = time.Now()
 	}
-	return
-
 }

@@ -33,11 +33,10 @@ func (ks *KeyboardShooter) Update() {
 	if ks.trigger() && time.Since(ks.lastShot) >= ks.cooldown {
 		ks.shoot()
 	}
-	return
 }
 
 func (ks *KeyboardShooter) Draw(screen *ebiten.Image) {
-	return
+	// shooter doesn't need to be drawn
 }
 
 func (ks *KeyboardShooter) shoot() {
@@ -52,6 +51,4 @@ func (ks *KeyboardShooter) shoot() {
 		// bul.rotation = 270 * (math.Pi / 180)
 		ks.lastShot = time.Now()
 	}
-	return
-
 }

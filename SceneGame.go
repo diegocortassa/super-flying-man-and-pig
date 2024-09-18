@@ -127,7 +127,7 @@ func (g *Game) DrawGameState(screen *ebiten.Image) {
 		DrawTextWithShadow(screen, strings.Repeat("*", g.playerOne.Lives), assets.ArcadeFont, 10, globals.ScreenHeight-10, assets.ColorYellow)
 	} else {
 		if time.Now().Second()%2 == 0 {
-			msg = fmt.Sprintf("1UP\nPRESS FIRE")
+			msg = "1UP\nPRESS FIRE"
 		} else {
 			msg = fmt.Sprintf("1UP\n%05d", g.playerOne.Scores)
 		}
@@ -142,7 +142,7 @@ func (g *Game) DrawGameState(screen *ebiten.Image) {
 		DrawTextWithShadow(screen, strings.Repeat("*", g.playerTwo.Lives), assets.ArcadeFont, globals.ScreenWidth-30, globals.ScreenHeight-10, assets.ColorYellow)
 	} else {
 		if time.Now().Second()%2 == 0 {
-			msg = fmt.Sprintf("2UP\nPRESS FIRE")
+			msg = "2UP\nPRESS FIRE"
 		} else {
 			msg = fmt.Sprintf("2UP\n%05d", g.playerTwo.Scores)
 		}

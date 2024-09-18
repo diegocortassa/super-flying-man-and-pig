@@ -38,7 +38,7 @@ func (shooter *RotativeShooter) Update() {
 }
 
 func (shooter *RotativeShooter) Draw(screen *ebiten.Image) {
-	return
+	// shooter doesn't need to be drawn
 }
 
 // Shoot bullet from pool starting at position x,y
@@ -68,6 +68,4 @@ func (shooter *RotativeShooter) shoot(x, y float64) {
 		bul.Active = true
 		shooter.lastShot = time.Now()
 	}
-	return
-
 }
