@@ -50,10 +50,14 @@ func (g *Game) UpdateDirector() {
 
 	if input.IsPauseJustPressed() {
 		if g.paused {
-			assets.AudioPlayerPlaying.Play()
+			if assets.AudioPlayerPlaying != nil {
+				assets.AudioPlayerPlaying.Play()
+			}
 			g.paused = false
 		} else {
-			assets.AudioPlayerPlaying.Pause()
+			if assets.AudioPlayerPlaying != nil {
+				assets.AudioPlayerPlaying.Pause()
+			}
 			g.paused = true
 		}
 	}
