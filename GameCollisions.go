@@ -98,7 +98,7 @@ func HandleCollision(e1, e2 *Entity, g *Game) {
 			e1.Hit = true // animator will take care of playing explosion setting active to false when anim finishes
 		}
 
-		// TODO hit logic is patially shared with animator because it takes care of playing the destroy animation
+		// TODO hit logic is partially shared with animator because it takes care of playing the destroy animation
 		// TODO once an enemy is hit should not collide but adding && !e1.hit here gives superpowers to player
 		if !e2.Invulnerable && !e2.Hit && !e1.Exploding {
 			// animator will reset hit and invulnerable flags
