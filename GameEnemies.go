@@ -66,6 +66,8 @@ func SpawnEnemies(g *Game) {
 			spawnCat(g, c.X, -assets.SpriteSize)
 		case "Volcano":
 			spawnVolcano(g, c.X, -assets.SpriteSize)
+		case "Monkey":
+			spawnMonkey(g, c.X, -assets.SpriteSize)
 		}
 
 		if g.spawnHead < len(spawnScript)-1 {
@@ -99,7 +101,7 @@ func CleanEnemyList(g *Game) {
 // BaloonA
 func spawnBaloonA(g *Game, x, y float64) {
 	enemy := NewEntity(
-		"Baloon",
+		"BaloonA",
 		Vector{X: x, Y: y},
 	)
 	enemy.EntityType = TypeEnemy
@@ -126,7 +128,7 @@ func spawnBaloonA(g *Game, x, y float64) {
 // BaloonB
 func spawnBaloonB(g *Game, x, y float64) {
 	enemy := NewEntity(
-		"Baloon",
+		"BaloonB",
 		Vector{X: x, Y: y},
 	)
 	enemy.EntityType = TypeEnemy
@@ -264,7 +266,7 @@ func spawnFlyingMan2A(g *Game, x, y float64) {
 	}
 
 	enemy := NewEntity(
-		"FlyingMan2",
+		"FlyingMan2A",
 		Vector{X: globals.ScreenWidth / 2, Y: -assets.SpriteSize},
 	)
 	enemy.EntityType = TypeEnemy
@@ -324,7 +326,7 @@ func spawnFlyingMan2B(g *Game, x, y float64) {
 	}
 
 	enemy := NewEntity(
-		"FlyingMan3",
+		"FlyingMan2B",
 		Vector{X: globals.ScreenWidth/2 - assets.SpriteSize, Y: -assets.SpriteSize},
 	)
 	enemy.EntityType = TypeEnemy
@@ -431,6 +433,44 @@ func spawnVolcano(g *Game, x float64, y float64) {
 		g.enemiesBullettPool,
 	)
 	enemy.AddComponent(rshooter)
+
+	g.enemies = append(g.enemies, enemy)
+}
+
+// Monkey
+func spawnMonkey(g *Game, x float64, y float64) {
+	enemy := NewEntity(
+		"Monkey",
+		Vector{X: x, Y: y},
+	)
+	enemy.EntityType = TypeEnemy
+	enemy.ScoreValue = 500
+	// No hitbox, Volcanoes are indestructible
+	// enemy.HitBoxes = append(enemy.HitBoxes, Box{X: 10, Y: 10, W: 0, H: 0})
+
+	sequences := map[string]*Sequence{
+		"idle":    NewSequence(assets.AnimEnemyMonkey, assets.AnimFPS, true),
+		"destroy": NewSequence(assets.AnimExplosion, assets.AnimFPS, false),
+	}
+	animator := NewAnimator(enemy, sequences, "idle")
+	enemy.AddComponent(animator)
+
+	sounds := map[Sound]*audio.Player{SoundDestroy: assets.Sfx_exp_odd1Player, SoundFire: assets.Sfx_wpn_laser8Player}
+	soundPlayer := NewSoundPlayer(enemy, sounds)
+	enemy.AddComponent(soundPlayer)
+
+	speed := Vector{X: 0.0, Y: 0.498} // 4 va su, 6 va giu
+	cmover := NewConstantMover(enemy, speed)
+	enemy.AddComponent(cmover)
+
+	ashooter := NewAimedShooter(
+		enemy,
+		time.Millisecond*500,
+		g.enemiesBullettPool,
+		g.playerOne,
+		g.playerTwo,
+	)
+	enemy.AddComponent(ashooter)
 
 	g.enemies = append(g.enemies, enemy)
 }

@@ -134,6 +134,7 @@ var (
 	AnimEnemyThing      = []int{50, 51, 52, 53, 52, 51, 50}                     // EnemyThing
 	AnimEnemyCat        = []int{54, 55, 56, 57, 56, 55, 54}                     // EnemyCat
 	AnimEnemyVolcano    = []int{200, 71, 72, 73, 72, 71}                        // EnemyVolcano
+	AnimEnemyMonkey     = []int{74, 74, 75, 75, 76, 76, 77, 77}                 // EnemyMonkey
 )
 
 func InitAssets() {
