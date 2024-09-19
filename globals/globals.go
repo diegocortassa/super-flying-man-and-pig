@@ -18,10 +18,10 @@ const (
 	ScrollSpeed       = 30 // speed milliseconds per 1 pixel (33 pixels/sec)
 
 	Beach  = 0
-	Clouds = 1200
+	Clouds = 1100
 	Desert = 2000
 	Forest = 5600
-	Castle = 7600
+	Castle = 7000
 )
 
 var (
