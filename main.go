@@ -57,6 +57,9 @@ func main() {
 	case "Desert":
 		fmt.Println("Starting at Desert")
 		startPosition = globals.Desert
+	case "Badlands":
+		fmt.Println("Starting at Badlands")
+		startPosition = globals.Badlands
 	case "Forest":
 		fmt.Println("Starting at Forest")
 		startPosition = globals.Forest

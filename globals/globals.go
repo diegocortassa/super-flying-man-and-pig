@@ -17,11 +17,12 @@ const (
 	TilesScreenHeight = 12
 	ScrollSpeed       = 30 // speed milliseconds per 1 pixel (33 pixels/sec)
 
-	Beach  = 0
-	Clouds = 1100
-	Desert = 2000
-	Forest = 5600
-	Castle = 7000
+	Beach    = 0
+	Clouds   = 980
+	Desert   = 2000
+	Badlands = 4100
+	Forest   = 5350
+	Castle   = 7000
 )
 
 var (
