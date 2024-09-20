@@ -56,8 +56,10 @@ func SpawnEnemies(g *Game) {
 			spawnBaloonB(g, c.X, -assets.SpriteSize)
 		case "Thing":
 			spawnThing(g, c.X, -assets.SpriteSize)
-		case "FlyingMan1":
-			spawnFlyingMan1(g, c.X, -assets.SpriteSize)
+		case "FlyingMan1A":
+			spawnFlyingMan1A(g, c.X, -assets.SpriteSize)
+		case "FlyingMan1B":
+			spawnFlyingMan1B(g, c.X, -assets.SpriteSize)
 		case "FlyingMan2A":
 			spawnFlyingMan2A(g, c.X, -assets.SpriteSize)
 		case "FlyingMan2B":
@@ -154,6 +156,33 @@ func spawnBaloonB(g *Game, x, y float64) {
 
 // Thing
 func spawnThing(g *Game, x, y float64) {
+
+	var enemyWobble = []TimedCommand{
+		//     270
+		// 180     0
+		//     90
+		{time.Millisecond * 1, "rotate", "50"},
+		{time.Millisecond * 1, "speed", "1 1"},
+
+		{time.Millisecond * 400, "rotate", "130"},
+		{time.Millisecond * 1, "speed", "3 3"},
+
+		{time.Millisecond * 400, "rotate", "50"},
+		{time.Millisecond * 1, "speed", "1 1"},
+
+		{time.Millisecond * 400, "rotate", "130"},
+		{time.Millisecond * 1, "speed", "3 3"},
+
+		{time.Millisecond * 400, "rotate", "50"},
+		{time.Millisecond * 1, "speed", "1 1"},
+
+		{time.Millisecond * 400, "rotate", "130"},
+		{time.Millisecond * 1, "speed", "3 3"},
+
+		{time.Millisecond * 400, "rotate", "50"},
+		{time.Millisecond * 1, "speed", "1 1"},
+	}
+
 	enemy := NewEntity(
 		"Thing",
 		Vector{X: x, Y: y},
@@ -173,40 +202,29 @@ func spawnThing(g *Game, x, y float64) {
 	soundPlayer := NewSoundPlayer(enemy, sounds)
 	enemy.AddComponent(soundPlayer)
 
-	speed := Vector{X: 0.2, Y: 1}
-	cmover := NewMoverConstant(enemy, speed)
-	enemy.AddComponent(cmover)
+	mover := NewMoverScripted(enemy, enemyWobble)
+	enemy.AddComponent(mover)
+
 	g.enemies = append(g.enemies, enemy)
 }
 
-// Flying man 1
-func spawnFlyingMan1(g *Game, x, y float64) {
+// Flying man 1A
+func spawnFlyingMan1A(g *Game, x, y float64) {
 
-	var enemyRotateAndGo = []TimedCommand{
+	var enemyComeAndGo = []TimedCommand{
 		//     270
 		// 180     0
 		//     90
-		{time.Millisecond * 1, "rotate", "90"},
-		{time.Millisecond * 1000, "speed", "2 2"},
-		{time.Millisecond * 1500, "rotateAdd", "22"},
-		{time.Millisecond * 200, "rotateAdd", "22"},
-		{time.Millisecond * 200, "rotateAdd", "22"},
-		{time.Millisecond * 200, "rotateAdd", "22"},
-		{time.Millisecond * 200, "rotateAdd", "22"},
-		{time.Millisecond * 200, "rotateAdd", "22"},
-		{time.Millisecond * 200, "rotateAdd", "22"},
-		{time.Millisecond * 200, "rotateAdd", "22"},
-		{time.Millisecond * 200, "rotateAdd", "22"},
-		{time.Millisecond * 200, "rotateAdd", "22"},
-		{time.Millisecond * 200, "rotateAdd", "22"},
-		{time.Millisecond * 200, "rotateAdd", "22"},
-		{time.Millisecond * 200, "rotateAdd", "22"},
-		{time.Millisecond * 200, "rotateAdd", "22"},
-		{time.Millisecond * 200, "wait", ""},
+		{time.Millisecond * 1, "rotate", "50"},
+		{time.Millisecond * 1, "speed", "2 2"},
+		{time.Millisecond * 1000, "rotate", "115"},
+		{time.Millisecond * 400, "rotate", "70"},
+		{time.Millisecond * 600, "rotate", "150"},
+		{time.Millisecond * 1, "speed", "3 3"},
 	}
 
 	enemy := NewEntity(
-		"FlyingMan1",
+		"FlyingMan1A",
 		Vector{X: x, Y: y},
 	)
 	enemy.EntityType = TypeEnemy
@@ -224,7 +242,56 @@ func spawnFlyingMan1(g *Game, x, y float64) {
 	soundPlayer := NewSoundPlayer(enemy, sounds)
 	enemy.AddComponent(soundPlayer)
 
-	mover := NewMoverScripted(enemy, enemyRotateAndGo)
+	mover := NewMoverScripted(enemy, enemyComeAndGo)
+	enemy.AddComponent(mover)
+
+	shooter := NewShooterAimed(
+		enemy,
+		time.Millisecond*900,
+		g.enemiesBullettPool,
+		g.playerOne,
+		g.playerTwo,
+	)
+	enemy.AddComponent(shooter)
+
+	g.enemies = append(g.enemies, enemy)
+}
+
+// Flying man 1B
+func spawnFlyingMan1B(g *Game, x, y float64) {
+
+	var enemyComeAndGo = []TimedCommand{
+		//     270
+		// 180     0
+		//     90
+		{time.Millisecond * 1, "rotate", "130"},
+		{time.Millisecond * 1, "speed", "2 2"},
+		{time.Millisecond * 1000, "rotate", "65"},
+		{time.Millisecond * 400, "rotate", "110"},
+		{time.Millisecond * 600, "rotate", "30"},
+		{time.Millisecond * 1, "speed", "3 3"},
+	}
+
+	enemy := NewEntity(
+		"FlyingMan1B",
+		Vector{X: x, Y: y},
+	)
+	enemy.EntityType = TypeEnemy
+	enemy.ScoreValue = 100
+	enemy.HitBoxes = append(enemy.HitBoxes, Box{X: 5, Y: 2, W: 15, H: 20})
+
+	sequences := map[string]*Sequence{
+		"idle":    NewSequence(assets.AnimEnemyFlyingMan1, assets.AnimFPS, true),
+		"destroy": NewSequence(assets.AnimSuperFlyingManDie, assets.AnimFPS, false),
+	}
+	animator := NewAnimator(enemy, sequences, "idle")
+	enemy.AddComponent(animator)
+
+	sounds := map[Sound]*audio.Player{SoundDestroy: assets.Sfx_exp_odd1Player, SoundFire: assets.Sfx_wpn_laser8Player}
+	soundPlayer := NewSoundPlayer(enemy, sounds)
+	enemy.AddComponent(soundPlayer)
+
+	mover := NewMoverScripted(enemy, enemyComeAndGo)
 	enemy.AddComponent(mover)
 
 	shooter := NewShooterAimed(
@@ -465,7 +532,7 @@ func spawnMonkey(g *Game, x float64, y float64) {
 
 	shooter := NewShooterAimed(
 		enemy,
-		time.Millisecond*500,
+		time.Millisecond*1000,
 		g.enemiesBullettPool,
 		g.playerOne,
 		g.playerTwo,
