@@ -30,7 +30,7 @@ func (g *Game) resetPlayerOne() {
 	soundPlayer := NewSoundPlayer(g.playerOne, sounds)
 	g.playerOne.AddComponent(soundPlayer)
 
-	g.playerOne.Lives = 3
+	g.playerOne.Lives = g.startLives
 
 	keyBinds := Keybinds{
 		Up:    input.IsP1UpPressed,
@@ -75,7 +75,7 @@ func (g *Game) resetPlayerTwo() {
 	soundPlayer := NewSoundPlayer(g.playerTwo, sounds)
 	g.playerTwo.AddComponent(soundPlayer)
 
-	g.playerTwo.Lives = 3
+	g.playerTwo.Lives = g.startLives
 
 	keyBinds := Keybinds{
 		Up:    input.IsP2UpPressed,

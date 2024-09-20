@@ -24,6 +24,7 @@ var (
 	fullScreen    bool
 	startAt       string
 	startPosition int
+	startLives    int
 )
 
 func main() {
@@ -34,6 +35,7 @@ func main() {
 	flag.BoolVar(&globals.Debug, "debug", false, "enable debug")
 	flag.StringVar(&startAt, "startat", "Beach", "Start at coordinates Beach, Clouds, Desert, Forest or Castle")
 	flag.Float64Var(&assets.SoundVolume, "soundvolume", assets.DefaultSoundVolume*10, "Set sound volume 0 to 10")
+	flag.IntVar(&startLives, "startLives", 3, "Set lives number (default 3)")
 	flag.Parse()
 
 	// Volume must be a float64 from 0 to 1
@@ -71,7 +73,7 @@ func main() {
 		startPosition = globals.Beach
 	}
 
-	g := NewGame(FlagCRT, startPosition)
+	g := NewGame(FlagCRT, startPosition, startLives)
 
 	ebiten.SetWindowSize(globals.ScreenWidth*zoom, globals.ScreenHeight*zoom)
 	ebiten.SetWindowTitle("Super flying man and Pig")

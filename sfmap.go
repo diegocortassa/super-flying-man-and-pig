@@ -57,6 +57,8 @@ type Game struct {
 
 	lastSpawn time.Time // last time an enemy was spawned
 	spawnHead int       // index on spawn script
+
+	startLives int
 }
 
 func (g *Game) init() {
@@ -76,7 +78,7 @@ func (g *Game) reset() {
 	// Enemies
 	g.enemies = nil
 	// Enemies Bullets
-	g.enemiesBullettPool = initBulletPool("EnemyBullet", TypeEnemyBullet, assets.AnimEnemyBullet1, 20, 10, Vector{X: 0, Y: 2}, Box{X: 9, Y: 9, W: 6, H: 6})
+	g.enemiesBullettPool = initBulletPool("EnemyBullet", TypeEnemyBullet, assets.AnimEnemyBullet1, 20, 12, Vector{X: 0, Y: 2}, Box{X: 9, Y: 9, W: 6, H: 6})
 	g.lastSpawn = time.Now()
 	g.spawnHead = 0
 }
@@ -174,9 +176,10 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (int, int) {
 	return globals.ScreenWidth, globals.ScreenHeight
 }
 
-func NewGame(flagCRT bool, startPosition int) ebiten.Game {
+func NewGame(flagCRT bool, startPosition int, startLives int) ebiten.Game {
 	g := &Game{}
 	g.StartPosition = startPosition
+	g.startLives = startLives
 	g.init()
 	if flagCRT {
 		return &GameWithCRTEffect{Game: g}
