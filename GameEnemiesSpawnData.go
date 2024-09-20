@@ -602,12 +602,10 @@ var spawnScript = []SpawnCommand{
 	{8070, -1, "FlyingMan2B"},
 	{8080, -1, "FlyingMan2A"},
 	{8090, -1, "FlyingMan2B"},
-	{8100, -1, "FlyingMan2A"},
 
-	{8100, 128, "Volcano"},
-	{8103, 120, "Volcano"},
-	{8104, 130, "Volcano"},
-	{8107, 128, "Volcano"},
+	{8095, 128, "Volcano"},
+
+	{8100, -1, "FlyingMan2A"},
 
 	{8108, 46, "Monkey"},
 	{8109, 206, "Monkey"},
