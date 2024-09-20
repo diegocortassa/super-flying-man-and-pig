@@ -11,6 +11,15 @@ import (
 
 // Draws text using it's center point as coordinates
 func DrawTextByCenter(screen *ebiten.Image, msg string, font font.Face, cx, cy int, textColor color.Color) {
+
+	// "github.com/hajimehoshi/ebiten/v2/text/v2"
+	// W, H := text.Measure(msg, font, 1)
+	// x, y := cx-W/2, cy-h/2
+	// op := &text.DrawOptions{}
+	// op.GeoM.Translate(x, y)
+	// op.ColorScale.ScaleWithColor(textColor)
+	// text.Draw(screen, msg, font, op)
+
 	bounds := text.BoundString(font, msg)
 	x, y := cx-bounds.Min.X-bounds.Dx()/2, cy-bounds.Min.Y-bounds.Dy()/2
 	text.Draw(screen, msg, font, x, y, textColor)

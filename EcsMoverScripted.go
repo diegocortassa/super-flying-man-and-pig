@@ -19,7 +19,7 @@ type TimedCommand struct {
 }
 
 // Moves an entity Following a given script
-type ScriptedMover struct {
+type MoverScripted struct {
 	active     bool
 	container  *Entity
 	speed      Vector
@@ -28,8 +28,8 @@ type ScriptedMover struct {
 	script     []TimedCommand
 }
 
-func NewScriptedMover(container *Entity, script []TimedCommand) *ScriptedMover {
-	return &ScriptedMover{
+func NewMoverScripted(container *Entity, script []TimedCommand) *MoverScripted {
+	return &MoverScripted{
 		active:    true,
 		container: container,
 		speed:     Vector{0, 0},
@@ -38,7 +38,7 @@ func NewScriptedMover(container *Entity, script []TimedCommand) *ScriptedMover {
 	}
 }
 
-func (mover *ScriptedMover) Update() {
+func (mover *MoverScripted) Update() {
 	if !mover.container.Active || mover.container.Hit {
 		return
 	}
@@ -84,6 +84,6 @@ func (mover *ScriptedMover) Update() {
 	}
 }
 
-func (k *ScriptedMover) Draw(screen *ebiten.Image) {
+func (k *MoverScripted) Draw(screen *ebiten.Image) {
 	return
 }

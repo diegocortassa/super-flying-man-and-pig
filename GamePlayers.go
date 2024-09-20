@@ -39,11 +39,11 @@ func (g *Game) resetPlayerOne() {
 		Right: input.IsP1RightPressed,
 		Fire:  input.IsP1FirePressed,
 	}
-	mover := NewKeyboardMover(g.playerOne, keyBinds, Vector{X: 1, Y: 1})
+	mover := NewMoverKeyboard(g.playerOne, keyBinds, Vector{X: 1, Y: 1})
 	g.playerOne.AddComponent(mover)
 
 	g.playerOneBullettPool = initBulletPool("P1Bullet", TypePlayerOneBullet, assets.AnimSuperFlyingManPew, assets.AnimFPS, 5, Vector{X: 0, Y: -4}, Box{X: 8, Y: 2, W: 8, H: 8})
-	shooter := NewKeyboardShooter(
+	shooter := NewShooterKeyboard(
 		g.playerOne,
 		input.IsP1FirePressed,
 		g.playerOneBullettPool,
@@ -51,7 +51,7 @@ func (g *Game) resetPlayerOne() {
 	)
 	g.playerOne.AddComponent(shooter)
 
-	gpMover := NewGamePadMover(g.playerOne, 0, Vector{X: 1, Y: 1}, g.playerOneBullettPool, time.Millisecond*250)
+	gpMover := NewMoverGamePad(g.playerOne, 0, Vector{X: 1, Y: 1}, g.playerOneBullettPool, time.Millisecond*250)
 	g.playerOne.AddComponent(gpMover)
 }
 
@@ -84,11 +84,11 @@ func (g *Game) resetPlayerTwo() {
 		Right: input.IsP2RightPressed,
 		Fire:  input.IsP2FirePressed,
 	}
-	mover := NewKeyboardMover(g.playerTwo, keyBinds, Vector{X: 1, Y: 1})
+	mover := NewMoverKeyboard(g.playerTwo, keyBinds, Vector{X: 1, Y: 1})
 	g.playerTwo.AddComponent(mover)
 
 	g.playerTwoBullettPool = initBulletPool("P2Bullet", TypePlayerTwoBullet, assets.AnimPigPew, assets.AnimFPS, 5, Vector{X: 0, Y: -4}, Box{X: 8, Y: 2, W: 8, H: 8})
-	shooter := NewKeyboardShooter(
+	shooter := NewShooterKeyboard(
 		g.playerTwo,
 		input.IsP2FirePressed,
 		g.playerTwoBullettPool,
@@ -96,6 +96,6 @@ func (g *Game) resetPlayerTwo() {
 	)
 	g.playerTwo.AddComponent(shooter)
 
-	gpMover := NewGamePadMover(g.playerTwo, 1, Vector{X: 1, Y: 1}, g.playerTwoBullettPool, time.Millisecond*250)
+	gpMover := NewMoverGamePad(g.playerTwo, 1, Vector{X: 1, Y: 1}, g.playerTwoBullettPool, time.Millisecond*250)
 	g.playerTwo.AddComponent(gpMover)
 }

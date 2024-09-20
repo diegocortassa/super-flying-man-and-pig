@@ -18,7 +18,7 @@ func initBulletPool(name string, etype EntityType, anim []int, animFPS float64, 
 		animator := NewAnimator(bul, sequences, "idle")
 		bul.AddComponent(animator)
 
-		mover := NewConstantMover(bul, speed)
+		mover := NewMoverConstant(bul, speed)
 		bul.AddComponent(mover)
 		bul.Active = false
 		pool = append(pool, bul)

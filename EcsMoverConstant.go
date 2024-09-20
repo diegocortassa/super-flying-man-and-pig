@@ -7,21 +7,21 @@ import (
 )
 
 // Moves an entity at constant velocity
-type ConstantMover struct {
+type MoverConstant struct {
 	active    bool
 	container *Entity
 	speed     Vector
 }
 
-func NewConstantMover(container *Entity, speed Vector) *ConstantMover {
-	return &ConstantMover{
+func NewMoverConstant(container *Entity, speed Vector) *MoverConstant {
+	return &MoverConstant{
 		active:    true,
 		container: container,
 		speed:     speed,
 	}
 }
 
-func (mover *ConstantMover) Update() {
+func (mover *MoverConstant) Update() {
 	if !mover.active || mover.container.Hit {
 		return
 	}
@@ -35,6 +35,6 @@ func (mover *ConstantMover) Update() {
 	}
 }
 
-func (k *ConstantMover) Draw(screen *ebiten.Image) {
+func (k *MoverConstant) Draw(screen *ebiten.Image) {
 	// mover doesn't need to be drawn
 }

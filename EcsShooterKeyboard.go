@@ -6,7 +6,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-type KeyboardShooter struct {
+type ShooterKeyboard struct {
 	active      bool
 	container   *Entity
 	trigger     IsKeyPressed
@@ -15,8 +15,8 @@ type KeyboardShooter struct {
 	lastShot    time.Time
 }
 
-func NewKeyboardShooter(container *Entity, trigger IsKeyPressed, bulletsPool []*Entity, cooldown time.Duration) *KeyboardShooter {
-	return &KeyboardShooter{
+func NewShooterKeyboard(container *Entity, trigger IsKeyPressed, bulletsPool []*Entity, cooldown time.Duration) *ShooterKeyboard {
+	return &ShooterKeyboard{
 		active:      true,
 		bulletsPool: bulletsPool,
 		container:   container,
@@ -26,7 +26,7 @@ func NewKeyboardShooter(container *Entity, trigger IsKeyPressed, bulletsPool []*
 	}
 }
 
-func (ks *KeyboardShooter) Update() {
+func (ks *ShooterKeyboard) Update() {
 	if !ks.container.Active || ks.container.Hit {
 		return
 	}
@@ -35,11 +35,11 @@ func (ks *KeyboardShooter) Update() {
 	}
 }
 
-func (ks *KeyboardShooter) Draw(screen *ebiten.Image) {
+func (ks *ShooterKeyboard) Draw(screen *ebiten.Image) {
 	// shooter doesn't need to be drawn
 }
 
-func (ks *KeyboardShooter) shoot() {
+func (ks *ShooterKeyboard) shoot() {
 	if bul, ok := BullettFromPool(ks.bulletsPool); ok {
 		// Play fire sound
 		sp := ks.container.GetComponent(&SoundPlayer{}).(*SoundPlayer)

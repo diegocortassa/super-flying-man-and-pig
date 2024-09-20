@@ -8,7 +8,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-type AimedShooter struct {
+type ShooterAimed struct {
 	active    bool
 	container *Entity
 	p1        *Entity
@@ -18,8 +18,8 @@ type AimedShooter struct {
 	lastShot  time.Time
 }
 
-func NewAimedShooter(container *Entity, trigger time.Duration, pool []*Entity, p1, p2 *Entity) *AimedShooter {
-	return &AimedShooter{
+func NewShooterAimed(container *Entity, trigger time.Duration, pool []*Entity, p1, p2 *Entity) *ShooterAimed {
+	return &ShooterAimed{
 		active:    true,
 		pool:      pool,
 		container: container,
@@ -30,26 +30,26 @@ func NewAimedShooter(container *Entity, trigger time.Duration, pool []*Entity, p
 	}
 }
 
-func (shooter *AimedShooter) Update() {
+func (shooter *ShooterAimed) Update() {
 	if time.Since(shooter.lastShot) >= shooter.trigger && !shooter.container.Hit {
 		shooter.shoot(shooter.container.Position.X+25, shooter.container.Position.Y-20)
 		shooter.lastShot = time.Now()
 	}
 }
 
-func (shooter *AimedShooter) Draw(screen *ebiten.Image) {
+func (shooter *ShooterAimed) Draw(screen *ebiten.Image) {
 	// shooter doesn't need to be drawn
 }
 
 // Shoot bullet from pool starting at position x,y
-func (shooter *AimedShooter) shoot(x, y float64) {
+func (shooter *ShooterAimed) shoot(x, y float64) {
 	if bul, ok := BullettFromPool(shooter.pool); ok {
 		// do not shoot while exploding
 		if shooter.container.Exploding {
 			return
 		}
 
-		mover := bul.GetComponent(&ConstantMover{}).(*ConstantMover)
+		mover := bul.GetComponent(&MoverConstant{}).(*MoverConstant)
 
 		var px, py float64
 		distP1 := distance(shooter.container, shooter.p1)

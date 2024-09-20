@@ -7,7 +7,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-type ConstantShooter struct {
+type ShooterConstant struct {
 	active    bool
 	container *Entity
 	trigger   time.Duration
@@ -15,8 +15,8 @@ type ConstantShooter struct {
 	lastShot  time.Time
 }
 
-func NewConstantShooter(container *Entity, trigger time.Duration, pool []*Entity) *ConstantShooter {
-	return &ConstantShooter{
+func NewShooterConstant(container *Entity, trigger time.Duration, pool []*Entity) *ShooterConstant {
+	return &ShooterConstant{
 		active:    true,
 		pool:      pool,
 		container: container,
@@ -25,19 +25,19 @@ func NewConstantShooter(container *Entity, trigger time.Duration, pool []*Entity
 	}
 }
 
-func (shooter *ConstantShooter) Update() {
+func (shooter *ShooterConstant) Update() {
 	if time.Since(shooter.lastShot) >= shooter.trigger && !shooter.container.Hit {
 		shooter.shoot(shooter.container.Position.X+25, shooter.container.Position.Y-20)
 		shooter.lastShot = time.Now()
 	}
 }
 
-func (shooter *ConstantShooter) Draw(screen *ebiten.Image) {
+func (shooter *ShooterConstant) Draw(screen *ebiten.Image) {
 	// shooter doesn't need to be drawn
 }
 
 // Shoot bullet from pool starting at position x,y
-func (shooter *ConstantShooter) shoot(x, y float64) {
+func (shooter *ShooterConstant) shoot(x, y float64) {
 	if bul, ok := BullettFromPool(shooter.pool); ok {
 		// do not shoot while exploding
 		if shooter.container.Exploding {
@@ -51,7 +51,7 @@ func (shooter *ConstantShooter) shoot(x, y float64) {
 		bul.Position.Y = shooter.container.Position.Y + assets.SpriteSize/2
 		// reset the bullet speed/direction to Vector{0, 2}
 		// TODO the speed/direction could be changed with:
-		mover := bul.GetComponent(&ConstantMover{}).(*ConstantMover)
+		mover := bul.GetComponent(&MoverConstant{}).(*MoverConstant)
 		mover.speed = Vector{0, 2}
 		bul.Active = true
 		shooter.lastShot = time.Now()

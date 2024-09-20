@@ -11,15 +11,15 @@ type Keybinds struct {
 	Up, Down, Left, Right, Fire IsKeyPressed
 }
 
-type KeyBoardMover struct {
+type MoverKeyBoard struct {
 	active    bool
 	container *Entity
 	Keybinds  Keybinds
 	speed     Vector
 }
 
-func NewKeyboardMover(container *Entity, Keybinds Keybinds, speed Vector) *KeyBoardMover {
-	return &KeyBoardMover{
+func NewMoverKeyboard(container *Entity, Keybinds Keybinds, speed Vector) *MoverKeyBoard {
+	return &MoverKeyBoard{
 		active:    true,
 		container: container,
 		Keybinds:  Keybinds,
@@ -27,7 +27,7 @@ func NewKeyboardMover(container *Entity, Keybinds Keybinds, speed Vector) *KeyBo
 	}
 }
 
-func (k *KeyBoardMover) Update() {
+func (k *MoverKeyBoard) Update() {
 	if !k.container.Active || k.container.Hit {
 		return
 	}
@@ -45,6 +45,6 @@ func (k *KeyBoardMover) Update() {
 	}
 }
 
-func (k *KeyBoardMover) Draw(screen *ebiten.Image) {
+func (k *MoverKeyBoard) Draw(screen *ebiten.Image) {
 	// mover doesn't need to be drawn
 }

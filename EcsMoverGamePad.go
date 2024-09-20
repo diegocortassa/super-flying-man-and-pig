@@ -12,7 +12,7 @@ type ButtonBinds struct {
 	Up, Down, Left, Right, Fire, Secondary ebiten.Key
 }
 
-type GamePadMover struct {
+type MoverGamePad struct {
 	active        bool
 	container     *Entity
 	buttonbinds   ButtonBinds
@@ -24,9 +24,9 @@ type GamePadMover struct {
 	lastShot    time.Time
 }
 
-// func NewGamePadMover(container *Entity, buttonBinds ButtonBinds, speed Vector) *GamePadMover {
-func NewGamePadMover(container *Entity, gamePadNumber int, speed Vector, bulletsPool []*Entity, cooldown time.Duration) *GamePadMover {
-	return &GamePadMover{
+// func NewMoverGamePad(container *Entity, buttonBinds ButtonBinds, speed Vector) *MoverGamePad {
+func NewMoverGamePad(container *Entity, gamePadNumber int, speed Vector, bulletsPool []*Entity, cooldown time.Duration) *MoverGamePad {
+	return &MoverGamePad{
 		active:        true,
 		container:     container,
 		gamePadNumber: gamePadNumber,
@@ -38,7 +38,7 @@ func NewGamePadMover(container *Entity, gamePadNumber int, speed Vector, bullets
 	}
 }
 
-func (gp *GamePadMover) Update() {
+func (gp *MoverGamePad) Update() {
 	if !gp.container.Active || gp.container.Hit {
 		return
 	}
@@ -101,11 +101,11 @@ func (gp *GamePadMover) Update() {
 
 }
 
-func (gp *GamePadMover) Draw(screen *ebiten.Image) {
+func (gp *MoverGamePad) Draw(screen *ebiten.Image) {
 	// mover doesn't need to be drawn
 }
 
-func (gp *GamePadMover) shoot() {
+func (gp *MoverGamePad) shoot() {
 	if bul, ok := BullettFromPool(gp.bulletsPool); ok {
 		bul.Active = true
 		bul.Position.X = gp.container.Position.X
