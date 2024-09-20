@@ -224,17 +224,17 @@ func spawnFlyingMan1(g *Game, x, y float64) {
 	soundPlayer := NewSoundPlayer(enemy, sounds)
 	enemy.AddComponent(soundPlayer)
 
-	cmover := NewScriptedMover(enemy, enemyRotateAndGo)
-	enemy.AddComponent(cmover)
+	mover := NewScriptedMover(enemy, enemyRotateAndGo)
+	enemy.AddComponent(mover)
 
-	cshooter := NewAimedShooter(
+	shooter := NewAimedShooter(
 		enemy,
 		time.Millisecond*900,
 		g.enemiesBullettPool,
 		g.playerOne,
 		g.playerTwo,
 	)
-	enemy.AddComponent(cshooter)
+	enemy.AddComponent(shooter)
 
 	g.enemies = append(g.enemies, enemy)
 }
@@ -284,17 +284,17 @@ func spawnFlyingMan2A(g *Game, x, y float64) {
 	soundPlayer := NewSoundPlayer(enemy, sounds)
 	enemy.AddComponent(soundPlayer)
 
-	cmover := NewScriptedMover(enemy, enemyRotateAndGo)
-	enemy.AddComponent(cmover)
+	mover := NewScriptedMover(enemy, enemyRotateAndGo)
+	enemy.AddComponent(mover)
 
-	cshooter := NewAimedShooter(
+	shooter := NewAimedShooter(
 		enemy,
 		time.Millisecond*900,
 		g.enemiesBullettPool,
 		g.playerOne,
 		g.playerTwo,
 	)
-	enemy.AddComponent(cshooter)
+	enemy.AddComponent(shooter)
 
 	g.enemies = append(g.enemies, enemy)
 }
@@ -344,17 +344,17 @@ func spawnFlyingMan2B(g *Game, x, y float64) {
 	soundPlayer := NewSoundPlayer(enemy, sounds)
 	enemy.AddComponent(soundPlayer)
 
-	cmover := NewScriptedMover(enemy, enemyRotateAndGo)
-	enemy.AddComponent(cmover)
+	mover := NewScriptedMover(enemy, enemyRotateAndGo)
+	enemy.AddComponent(mover)
 
-	cshooter := NewAimedShooter(
+	shooter := NewAimedShooter(
 		enemy,
 		time.Millisecond*900,
 		g.enemiesBullettPool,
 		g.playerOne,
 		g.playerTwo,
 	)
-	enemy.AddComponent(cshooter)
+	enemy.AddComponent(shooter)
 
 	g.enemies = append(g.enemies, enemy)
 }
@@ -386,15 +386,15 @@ func spawnCat(g *Game, x, y float64) {
 	// c.speed.Y = rand.Float64() * (max - min)
 
 	speed := Vector{X: rand.Float64()*2.0 - 1.0, Y: rand.Float64()}
-	cmover := NewConstantMover(enemy, speed)
-	enemy.AddComponent(cmover)
+	mover := NewConstantMover(enemy, speed)
+	enemy.AddComponent(mover)
 
-	cshooter := NewConstantShooter(
+	shooter := NewConstantShooter(
 		enemy,
 		time.Millisecond*600,
 		g.enemiesBullettPool,
 	)
-	enemy.AddComponent(cshooter)
+	enemy.AddComponent(shooter)
 
 	g.enemies = append(g.enemies, enemy)
 }
@@ -422,17 +422,17 @@ func spawnVolcano(g *Game, x float64, y float64) {
 	enemy.AddComponent(soundPlayer)
 
 	speed := Vector{X: 0.0, Y: 0.498} // 4 va su, 6 va giu
-	cmover := NewConstantMover(enemy, speed)
-	enemy.AddComponent(cmover)
+	mover := NewConstantMover(enemy, speed)
+	enemy.AddComponent(mover)
 
-	rshooter := NewRotativeShooter(
+	shooter := NewRotativeShooter(
 		enemy,
 		time.Millisecond*300,
 		180,
 		25,
 		g.enemiesBullettPool,
 	)
-	enemy.AddComponent(rshooter)
+	enemy.AddComponent(shooter)
 
 	g.enemies = append(g.enemies, enemy)
 }
@@ -460,17 +460,17 @@ func spawnMonkey(g *Game, x float64, y float64) {
 	enemy.AddComponent(soundPlayer)
 
 	speed := Vector{X: 0.0, Y: 0.498} // 4 va su, 6 va giu
-	cmover := NewConstantMover(enemy, speed)
-	enemy.AddComponent(cmover)
+	mover := NewConstantMover(enemy, speed)
+	enemy.AddComponent(mover)
 
-	ashooter := NewAimedShooter(
+	shooter := NewAimedShooter(
 		enemy,
 		time.Millisecond*500,
 		g.enemiesBullettPool,
 		g.playerOne,
 		g.playerTwo,
 	)
-	enemy.AddComponent(ashooter)
+	enemy.AddComponent(shooter)
 
 	g.enemies = append(g.enemies, enemy)
 }
