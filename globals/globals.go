@@ -20,7 +20,7 @@ const (
 	Beach    = 0
 	Clouds   = 980
 	Desert   = 2000
-	Badlands = 4100
+	Badlands = 3600
 	Forest   = 5350
 	Castle   = 7000
 )
