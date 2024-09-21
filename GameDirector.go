@@ -115,7 +115,7 @@ func (g *Game) UpdateDirector() {
 	// *SCENE* GameOver
 	if g.CurrentState == StateGameOver {
 		if input.IsP1FireJustPressed() || input.IsP2FireJustPressed() || time.Since(g.lastStateTransition) > time.Second*10 {
-			changed := g.ChangeState(StateTitle)
+			changed := g.ChangeState(StateHiscores)
 			if changed {
 				// assets.PlayTheme(assets.Theme1StagePlayer)
 				assets.StopAudioPlayer()
