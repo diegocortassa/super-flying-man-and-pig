@@ -124,7 +124,7 @@ func (g *Game) DrawGameState(screen *ebiten.Image) {
 
 	if g.playerOne.Active {
 		msg = fmt.Sprintf("1UP\n%05d", g.playerOne.Scores)
-		DrawTextWithShadow(screen, strings.Repeat("*", g.playerOne.Lives), assets.ArcadeFont, 10, globals.ScreenHeight-10, assets.ColorYellow)
+		DrawTextWithShadow(screen, strings.Repeat("♥", g.playerOne.Lives), assets.ArcadeFont, 10, globals.ScreenHeight-10, assets.ColorYellow)
 	} else {
 		if time.Now().Second()%2 == 0 {
 			msg = "1UP\nPRESS FIRE"
@@ -139,7 +139,7 @@ func (g *Game) DrawGameState(screen *ebiten.Image) {
 
 	if g.playerTwo.Active {
 		msg = fmt.Sprintf("2UP\n%05d", g.playerTwo.Scores)
-		DrawTextWithShadow(screen, strings.Repeat("*", g.playerTwo.Lives), assets.ArcadeFont, globals.ScreenWidth-30, globals.ScreenHeight-10, assets.ColorYellow)
+		DrawTextWithShadow(screen, strings.Repeat("♥", g.playerTwo.Lives), assets.ArcadeFont, globals.ScreenWidth-30, globals.ScreenHeight-10, assets.ColorYellow)
 	} else {
 		if time.Now().Second()%2 == 0 {
 			msg = "2UP\nPRESS FIRE"
