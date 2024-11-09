@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"math/rand"
 	"time"
 
@@ -38,17 +37,17 @@ func SpawnEnemies(g *Game) {
 	// if X position is -1 we use a random X start position
 	c := GetSpawnCommand(g.spawnHead)
 
-	log.Println("*** top position", screenTopPosition, "Next at", c.Position)
+	// log.Println("*** top position", screenTopPosition, "Next at", c.Position)
 	// If the game position is ahead of spawnHead skip passed positions
 	for screenTopPosition > c.Position && g.spawnHead < len(spawnScript)-1 {
-		log.Println("*** Skipping Command:", c, spawnScript[g.spawnHead], g.spawnHead)
+		// log.Println("*** Skipping Command:", c, spawnScript[g.spawnHead], g.spawnHead)
 		g.spawnHead++
 		c = GetSpawnCommand(g.spawnHead)
 	}
 
 	for screenTopPosition == c.Position { // Position based spawn
 		debug.DebugPrintf("*** Spawn Command:", c)
-		log.Println("*** Spawn Command:", c, spawnScript[g.spawnHead], g.spawnHead)
+		// log.Println("*** Spawn Command:", c, spawnScript[g.spawnHead], g.spawnHead)
 		switch c.Command {
 		case "BaloonA":
 			spawnBaloonA(g, c.X, -assets.SpriteSize)

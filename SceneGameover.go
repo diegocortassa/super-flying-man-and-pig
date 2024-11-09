@@ -12,7 +12,7 @@ import (
 )
 
 func (g *Game) UpdateGameOverState() {
-	// TBD
+	// Empty
 }
 
 func (g *Game) DrawGameOverState(screen *ebiten.Image) {
