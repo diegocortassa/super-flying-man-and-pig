@@ -19,7 +19,7 @@ func (g *Game) DrawCreditsState(screen *ebiten.Image) {
 	line += 15
 	DrawTextByCenter(screen, "DIEGO CORTASSA", assets.ArcadeFont, globals.ScreenWidth/2, globals.ScreenHeight/6+line, assets.ColorYellow)
 	line += 30
-	DrawTextByCenter(screen, "GRAPHIC", assets.ArcadeFont, globals.ScreenWidth/2, globals.ScreenHeight/6+line, assets.ColorWhite)
+	DrawTextByCenter(screen, "GRAPHICS", assets.ArcadeFont, globals.ScreenWidth/2, globals.ScreenHeight/6+line, assets.ColorWhite)
 	line += 15
 	DrawTextByCenter(screen, "DIEGO CORTASSA", assets.ArcadeFont, globals.ScreenWidth/2, globals.ScreenHeight/6+line, assets.ColorYellow)
 	line += 15
