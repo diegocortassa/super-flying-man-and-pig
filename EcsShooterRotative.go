@@ -34,7 +34,6 @@ func (shooter *ShooterRotative) Update() {
 		shooter.shoot(shooter.container.Position.X+25, shooter.container.Position.Y-20)
 		shooter.lastShot = time.Now()
 	}
-	return
 }
 
 func (shooter *ShooterRotative) Draw(screen *ebiten.Image) {

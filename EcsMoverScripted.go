@@ -85,5 +85,5 @@ func (mover *MoverScripted) Update() {
 }
 
 func (k *MoverScripted) Draw(screen *ebiten.Image) {
-	return
+	// mover doesn't need to be drawn
 }
