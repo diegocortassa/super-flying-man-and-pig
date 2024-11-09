@@ -8,8 +8,6 @@ import (
 	"image"
 	_ "image/png"
 	"log"
-	"math/rand"
-	"time"
 
 	"github.com/dcortassa/super-flying-man-and-pig/assets"
 	"github.com/dcortassa/super-flying-man-and-pig/globals"
@@ -45,10 +43,10 @@ func main() {
 	assets.SoundVolume /= float64(10)
 
 	// initializations before creating the game
-	rand.Seed(time.Now().UnixNano())
 	assets.InitAssets()
 	assets.InitSounds()
 
+	fmt.Println("Super flying man and Pig - v 0.1")
 	switch startAt {
 	case "Beach":
 		fmt.Println("Starting at Beach")
