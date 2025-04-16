@@ -18,6 +18,8 @@ type MoverGamePad struct {
 	buttonbinds   ButtonBinds
 	speed         Vector
 	gamePadNumber int
+	gamepadIDsBuf []ebiten.GamepadID
+	gamepadIDs    map[ebiten.GamepadID]struct{}
 
 	bulletsPool []*Entity
 	cooldown    time.Duration
@@ -46,7 +48,6 @@ func (gp *MoverGamePad) Update() {
 	// if gp.gamepadIDs == nil {
 	// 	gp.gamepadIDs = map[ebiten.GamepadID]struct{}{}
 	// }
-	// // fmt.Println("GamePadMover update")
 	// gp.gamepadIDsBuf = inpututil.AppendJustConnectedGamepadIDs(gp.gamepadIDsBuf[:0])
 	// for _, id := range gp.gamepadIDsBuf {
 	// 	fmt.Printf("gamepad connected: id: %d, SDL ID: %s", id, ebiten.GamepadSDLID(id))
@@ -59,6 +60,7 @@ func (gp *MoverGamePad) Update() {
 	// 	}
 	// }
 
+	// gamepadIDs := gp.gamepadIDs
 	gamepadIDs := ebiten.GamepadIDs()
 
 	if len(gamepadIDs) >= gp.gamePadNumber+1 {
