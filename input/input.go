@@ -80,6 +80,22 @@ func IsP1FireJustPressed() bool {
 	return false
 }
 
+func IsP1UpJustPressed() bool {
+	return inpututil.IsKeyJustPressed(ebiten.KeyArrowUp)
+}
+
+func IsP1DownJustPressed() bool {
+	return inpututil.IsKeyJustPressed(ebiten.KeyArrowDown)
+}
+
+func IsP1LeftJustPressed() bool {
+	return inpututil.IsKeyJustPressed(ebiten.KeyArrowLeft)
+}
+
+func IsP1RightJustPressed() bool {
+	return inpututil.IsKeyJustPressed(ebiten.KeyArrowRight)
+}
+
 func IsP1FirePressed() bool {
 	gamepadIDs := ebiten.GamepadIDs()
 	if len(gamepadIDs) >= 1 {

@@ -2,6 +2,7 @@ package main
 
 import (
 	_ "embed"
+	"fmt"
 
 	"github.com/dcortassa/super-flying-man-and-pig/assets"
 	"github.com/dcortassa/super-flying-man-and-pig/globals"
@@ -9,7 +10,7 @@ import (
 )
 
 func (g *Game) UpdateHiscoresState() {
-	// TBD
+	// Empty
 }
 
 func (g *Game) DrawHiscoreState(screen *ebiten.Image) {
@@ -20,13 +21,11 @@ func (g *Game) DrawHiscoreState(screen *ebiten.Image) {
 	DrawTextByCenter(screen, "SCORE", assets.ArcadeFont, globals.ScreenWidth/6*3, globals.ScreenHeight/4+20, assets.ColorWhite)
 	DrawTextByCenter(screen, "NAME", assets.ArcadeFont, globals.ScreenWidth/6*5, globals.ScreenHeight/4+20, assets.ColorWhite)
 
-	var HiScores = [][]string{{"1", "50000", "DIE"}, {"2", "40000", "LIV"}, {"3", "30000", "AND"}, {"4", "20000", "NOR"}, {"5", "10000", "MRJ"}}
 	line := 40
-
-	for _, score := range HiScores {
-		DrawTextByCenter(screen, score[0], assets.ArcadeFont, globals.ScreenWidth/6, globals.ScreenHeight/4+line, assets.ColorYellow)
-		DrawTextByCenter(screen, score[1], assets.ArcadeFont, globals.ScreenWidth/6*3, globals.ScreenHeight/4+line, assets.ColorYellow)
-		DrawTextByCenter(screen, score[2], assets.ArcadeFont, globals.ScreenWidth/6*5, globals.ScreenHeight/4+line, assets.ColorWhite)
+	for i, HiScoresItem := range g.HiScoresTable {
+		DrawTextByCenter(screen, fmt.Sprintf("%1d", i+1), assets.ArcadeFont, globals.ScreenWidth/6, globals.ScreenHeight/4+line, assets.ColorYellow)
+		DrawTextByCenter(screen, fmt.Sprintf("%5d", HiScoresItem.Scores), assets.ArcadeFont, globals.ScreenWidth/6*3, globals.ScreenHeight/4+line, assets.ColorYellow)
+		DrawTextByCenter(screen, HiScoresItem.Name, assets.ArcadeFont, globals.ScreenWidth/6*5, globals.ScreenHeight/4+line, assets.ColorWhite)
 		line += 20
 	}
 

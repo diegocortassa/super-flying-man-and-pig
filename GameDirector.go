@@ -16,16 +16,6 @@ const (
 
 func (g *Game) UpdateDirector() {
 
-	// g.state = StateHiscores
-
-	// moved to hud debug
-	// var m runtime.MemStats
-	// runtime.ReadMemStats(&m)
-	// debug.DebugPrintf(fmt.Sprintf("\tAlloc = %v MiB", m.Alloc/1024/1024))
-	// debug.DebugPrintf(fmt.Sprintf("\tTotalAlloc = %v MiB", m.TotalAlloc/1024/1024))
-	// debug.DebugPrintf(fmt.Sprintf("\tSys = %v MiB", m.Sys/1024/1024))
-	// debug.DebugPrintf(fmt.Sprintf("\tNumGC = %v\n", m.NumGC))
-
 	// In all States
 	if input.IsExitJustPressed() {
 		os.Exit(0)
@@ -69,6 +59,8 @@ func (g *Game) UpdateDirector() {
 	// At first init
 	if g.CurrentState == StateInit {
 		g.CurrentState = StateTitle
+		// g.playerOne.Scores = 235
+		// g.CurrentState = StateGameOver
 		// assets.PlayTheme(assets.Theme1StagePlayer)
 	}
 
@@ -114,12 +106,31 @@ func (g *Game) UpdateDirector() {
 
 	// *SCENE* GameOver
 	if g.CurrentState == StateGameOver {
-		if input.IsP1FireJustPressed() || input.IsP2FireJustPressed() || time.Since(g.lastStateTransition) > time.Second*10 {
-			changed := g.ChangeState(StateHiscores)
-			if changed {
-				// assets.PlayTheme(assets.Theme1StagePlayer)
-				assets.StopAudioPlayer()
+		changed := false
+		if g.playerOne.Scores >= g.HiScoresTable[4].Scores &&
+			(input.IsP1FireJustPressed() ||
+				input.IsP2FireJustPressed() ||
+				time.Since(g.lastStateTransition) > time.Second*10) {
+
+			// Prepare HiScores entry
+			i := 0
+			for i = 0; i < len(g.HiScoresTable); i++ {
+				if g.playerOne.Scores >= g.HiScoresTable[i].Scores {
+					g.HiScoresTable[i].Name = "AAA"
+					g.HiScoresTable[i].Scores = g.playerOne.Scores
+					break
+				}
 			}
+
+			_ = g.ChangeState(StateHiscoresInsert)
+			assets.PlayTheme(assets.ThemeBossFightPlayer)
+
+		} else if input.IsP1FireJustPressed() || input.IsP2FireJustPressed() || time.Since(g.lastStateTransition) > time.Second*10 {
+			changed = g.ChangeState(StateTitle)
+		}
+		if changed {
+			// assets.PlayTheme(assets.Theme1StagePlayer)
+			assets.StopAudioPlayer()
 		}
 		return
 	}
@@ -133,11 +144,20 @@ func (g *Game) UpdateDirector() {
 		return
 	}
 
-	// *SCENE* Highscores
+	// *SCENE* Hiscores
 	if g.CurrentState == StateHiscores {
 		g.CheckStartPressed()
 		if time.Since(g.lastStateTransition) > time.Second*attractRotationTime {
 			_ = g.ChangeState(StateCredits)
+		}
+		return
+	}
+
+	// *SCENE* HiscoresInsert
+	if g.CurrentState == StateHiscoresInsert {
+		if input.IsP1FireJustPressed() || input.IsP2FireJustPressed() || time.Since(g.lastStateTransition) > time.Second*28 {
+			_ = g.ChangeState(StateHiscores)
+			assets.StopAudioPlayer()
 		}
 		return
 	}
