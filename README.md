@@ -12,11 +12,17 @@ Download the Linux or Windows executable from [my web site](https://www.cortassa
 Download and install the Go language for you system:
 https://go.dev/doc/install
 Clone or download this repository:
+
 `git clone https://github.com/diegocortassa/super-flying-man-and-pig.git`
+
 change dir to the cloned repo:
+
 `cd SuperFlyingManAndPig`
+
 and build
+
 `go mod tidy`
+
 `go build -o build/super-flying-man-and-pig`
 
 you'll get the executable "super-flying-man-and-pig"
