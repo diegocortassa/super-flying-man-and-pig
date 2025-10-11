@@ -30,9 +30,6 @@ const (
 )
 
 var (
-	FullScreen bool // command line flag
-	FlagCRT    bool // command line flag
-
 	//go:embed crt.go
 	crtGo []byte
 )

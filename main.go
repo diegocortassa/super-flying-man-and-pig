@@ -8,33 +8,32 @@ import (
 	"image"
 	_ "image/png"
 	"log"
+	"os"
 
 	"github.com/diegocortassa/super-flying-man-and-pig/assets"
 	"github.com/diegocortassa/super-flying-man-and-pig/globals"
+	"github.com/diegocortassa/super-flying-man-and-pig/version"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
-const (
-	zoom = 2
-)
-
-var (
-	fullScreen    bool
-	startAt       string
-	startPosition int
-	startLives    int
-)
-
 func main() {
+	const zoom = 2
+	var startPosition int
 
-	flag.BoolVar(&fullScreen, "fullscreen", false, "run in fullscreen mode")
+	showVersion := flag.Bool("version", false, "Show version information")
+	fullScreen := flag.Bool("fullscreen", false, "run in fullscreen mode")
 	flag.BoolVar(&globals.MameKeys, "mamekeys", false, "Use MAME compatible key mapping")
-	flag.BoolVar(&FlagCRT, "crt", false, "enable the CRT simulation")
+	flagCRT := flag.Bool("crt", false, "enable the CRT simulation")
 	flag.BoolVar(&globals.Debug, "debug", false, "enable debug")
-	flag.StringVar(&startAt, "startat", "Beach", "Start at coordinates Beach, Clouds, Desert, Forest or Castle")
+	startAt := flag.String("startat", "Beach", "Start at coordinates Beach, Clouds, Desert, Forest or Castle")
 	flag.Float64Var(&assets.SoundVolume, "soundvolume", assets.DefaultSoundVolume*10, "Set sound volume 0 to 10")
-	flag.IntVar(&startLives, "startlives", 3, "Set lives number (default 3)")
+	startLives := flag.Int("startlives", 3, "Set lives number (default 3)")
 	flag.Parse()
+
+	if *showVersion {
+		fmt.Printf("Version: %s\n", version.String())
+		os.Exit(0)
+	}
 
 	// Volume must be a float64 from 0 to 1
 	if assets.SoundVolume > 10 {
@@ -47,7 +46,7 @@ func main() {
 	assets.InitSounds()
 
 	fmt.Println("Super flying man and Pig - v 0.1")
-	switch startAt {
+	switch *startAt {
 	case "Beach":
 		fmt.Println("Starting at Beach")
 		startPosition = globals.Beach
@@ -71,11 +70,11 @@ func main() {
 		startPosition = globals.Beach
 	}
 
-	g := NewGame(FlagCRT, startPosition, startLives)
+	g := NewGame(*flagCRT, startPosition, *startLives)
 
 	ebiten.SetWindowSize(globals.ScreenWidth*zoom, globals.ScreenHeight*zoom)
 	ebiten.SetWindowTitle("Super flying man and Pig")
-	if fullScreen {
+	if *fullScreen {
 		ebiten.SetFullscreen(true)
 	}
 	// ebiten.SetWindowResizable(true)
