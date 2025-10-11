@@ -8,7 +8,7 @@ I just hope somebody will enjoy this little game.
 Download the Linux or Windows executable from [my web site](https://www.cortassa.net/sfmap/) or play the Web (Wasm) version in the browser [here](https://www.cortassa.net/sfmap/wasm/)
 
 ## building
-**Super flying man & Pig** can be compiled on every platform supported by Go.
+**Super flying man & Pig** can be compiled on every platform supported by Go and Ebiten.
 
 Download and install the Go language for you system:
 

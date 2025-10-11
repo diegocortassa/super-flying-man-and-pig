@@ -90,7 +90,7 @@ func (an *animator) Draw(screen *ebiten.Image) {
 
 	if globals.Debug {
 		for _, b := range an.container.HitBoxes {
-			vector.DrawFilledRect(screen, float32(an.container.Position.X+b.X), float32(an.container.Position.Y+b.Y), float32(b.W), float32(b.H), color.RGBA{0xff, 0, 0, 0xff}, false)
+			vector.StrokeRect(screen, float32(an.container.Position.X+b.X), float32(an.container.Position.Y+b.Y), float32(b.W), float32(b.H), 1, color.RGBA{0xff, 0, 0, 0xff}, false)
 		}
 	}
 
