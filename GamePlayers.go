@@ -5,9 +5,9 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2/audio"
 
-	"github.com/dcortassa/super-flying-man-and-pig/assets"
-	"github.com/dcortassa/super-flying-man-and-pig/globals"
-	"github.com/dcortassa/super-flying-man-and-pig/input"
+	"github.com/diegocortassa/super-flying-man-and-pig/assets"
+	"github.com/diegocortassa/super-flying-man-and-pig/globals"
+	"github.com/diegocortassa/super-flying-man-and-pig/input"
 )
 
 func (g *Game) resetPlayerOne() {

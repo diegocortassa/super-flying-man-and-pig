@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/dcortassa/super-flying-man-and-pig/debug"
+	"github.com/diegocortassa/super-flying-man-and-pig/debug"
 )
 
 // TODO move collision detection to a component ***********

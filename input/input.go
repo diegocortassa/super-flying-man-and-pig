@@ -1,7 +1,7 @@
 package input
 
 import (
-	"github.com/dcortassa/super-flying-man-and-pig/globals"
+	"github.com/diegocortassa/super-flying-man-and-pig/globals"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )

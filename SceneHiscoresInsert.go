@@ -6,9 +6,9 @@ import (
 	"image/color"
 	"time"
 
-	"github.com/dcortassa/super-flying-man-and-pig/assets"
-	"github.com/dcortassa/super-flying-man-and-pig/globals"
-	"github.com/dcortassa/super-flying-man-and-pig/input"
+	"github.com/diegocortassa/super-flying-man-and-pig/assets"
+	"github.com/diegocortassa/super-flying-man-and-pig/globals"
+	"github.com/diegocortassa/super-flying-man-and-pig/input"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/vector"
 )

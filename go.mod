@@ -1,4 +1,4 @@
-module github.com/dcortassa/super-flying-man-and-pig
+module github.com/diegocortassa/super-flying-man-and-pig
 
 go 1.24.2
 

@@ -3,7 +3,7 @@ package main
 import (
 	"image/color"
 
-	"github.com/dcortassa/super-flying-man-and-pig/assets"
+	"github.com/diegocortassa/super-flying-man-and-pig/assets"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/text"
 	"golang.org/x/image/font"

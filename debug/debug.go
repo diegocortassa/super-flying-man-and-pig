@@ -3,7 +3,7 @@ package debug
 import (
 	"log"
 
-	"github.com/dcortassa/super-flying-man-and-pig/globals"
+	"github.com/diegocortassa/super-flying-man-and-pig/globals"
 )
 
 func DebugPrintf(str ...interface{}) {
