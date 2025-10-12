@@ -8,27 +8,36 @@ I just hope somebody will enjoy this little game.
 Download the Linux or Windows executable from [my web site](https://www.cortassa.net/sfmap/) or play the Web (Wasm) version in the browser [here](https://www.cortassa.net/sfmap/wasm/)
 
 ## building
-**Super flying man & Pig** can be compiled on every platform supported by Go and Ebiten.
+### **Super flying man & Pig** can be compiled on every platform supported by Go and Ebitengine.
 
-Download and install the Go language for you system:
+- Download and install the Go compiler, see GO [Download and install](https://go.dev/doc/install)
 
-https://go.dev/doc/install
+- For Debian/Ubuntu or WSL
+Install ebiten dependencies:
+```bash
+apt install libc6-dev libgl1-mesa-dev libxcursor-dev libxi-dev libxinerama-dev libxrandr-dev libxxf86vm-dev libasound2-dev pkg-config
+```
+- if you want to cross compile dor windows install go-winres to add resources to windows binary
+`go install github.com/tc-hib/go-winres@latest`
 
-Clone or download this repository:
+- Clone or download this repository:
 
 `git clone https://github.com/diegocortassa/super-flying-man-and-pig.git`
 
-change dir to the cloned repo:
+- Change dir to the cloned repo:
 
 `cd SuperFlyingManAndPig`
 
-and build
-
+- Download dependencies
 `go mod tidy`
 
-`go build -o build/super-flying-man-and-pig`
+- And build
+linux binary:
+`make build-linux`
+windows binary:
+`make build-windows`
 
-you'll get the executable "super-flying-man-and-pig"
+you'll find the executables in the dist folder
 
 ## Screenshots
 |                                      |                                      |                                      |

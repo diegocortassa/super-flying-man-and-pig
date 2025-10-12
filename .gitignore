@@ -6,6 +6,7 @@
 .idea
 .vscode
 .cache
+*.syso
 
 scratch
 build
