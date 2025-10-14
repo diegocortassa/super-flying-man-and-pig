@@ -1,4 +1,5 @@
 MAIN_NAME=super-flying-man-and-pig
+GO_PACKAGE=github.com/diegocortassa/$(MAIN_NAME)
 
 # Version information
 VERSION=$(shell cat VERSION)
@@ -7,24 +8,24 @@ COMMIT=$(shell git rev-parse --short HEAD 2>/dev/null || echo "unknown")
 BUILD_TIME=$(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
 
 # Build variables
-BINARY_NAME=SuperFlyingManAndPig
 GO=go
-GOFMT=gofmt
-GOFILES=$(shell find . -name "*.go")
-LDFLAGS="-X github.com/diegocortassa/$(MAIN_NAME)/version.Version=$(VERSION) \
-         -X github.com/diegocortassa/$(MAIN_NAME)/version.Commit=$(COMMIT) \
-         -X github.com/diegocortassa/$(MAIN_NAME)/version.BuildTime=$(BUILD_TIME)"
-LDFLAGS_WIN=-X=github.com/diegocortassa/$(MAIN_NAME)/version.Version=$(VERSION),-X=github.com/dcvix/$(MAIN_NAME)/internal/version.Commit=$(COMMIT),-X=github.com/dcvix/$(MAIN_NAME)/internal/version.BuildTime=$(BUILD_TIME)
+GOROOT=$(shell bash -c "go env GOROOT")
+LDFLAGS="-X $(GO_PACKAGE)/version.Version=$(VERSION) \
+         -X $(GO_PACKAGE)/version.Commit=$(COMMIT) \
+         -X $(GO_PACKAGE)/version.BuildTime=$(BUILD_TIME)"
+LDFLAGS_WIN=-X=$(GO_PACKAGE)/version.Version=$(VERSION),-X=$(GO_PACKAGE)/internal/version.Commit=$(COMMIT),-X=$(GO_PACKAGE)/internal/version.BuildTime=$(BUILD_TIME)
 
 # Platform-specific variables
-LINUX_AMD64_BINARY=$(BINARY_NAME)-v$(VERSION)-linux-amd64
-LINUX_AMD64_DIR=$(BINARY_NAME)-v$(VERSION)-linux-amd64
-WINDOWS_AMD64_BINARY=$(BINARY_NAME)-v$(VERSION)-windows-amd64.exe
-WINDOWS_AMD64_DIR=$(BINARY_NAME)-v$(VERSION)-windows-amd64
+LINUX_AMD64_BINARY=$(MAIN_NAME)
+LINUX_AMD64_DIR=$(MAIN_NAME)-v$(VERSION)-linux-amd64
+WINDOWS_AMD64_BINARY=$(MAIN_NAME).exe
+WINDOWS_AMD64_DIR=$(MAIN_NAME)-v$(VERSION)-windows-amd64
+WASM_BINARY=$(MAIN_NAME).wasm
+WASM_DIR=$(MAIN_NAME)-v$(VERSION)-wasm
 
 # Build all platforms
 .PHONY: build
-build: build-linux build-windows
+build: build-linux build-windows build-wasm
 
 # Build for Linux
 .PHONY: build-linux
@@ -41,11 +42,18 @@ build-windows:
 	mkdir -p dist/$(WINDOWS_AMD64_DIR)
 	GOOS=windows GOARCH=amd64 $(GO) build -ldflags $(LDFLAGS) -o dist/$(WINDOWS_AMD64_DIR)/$(WINDOWS_AMD64_BINARY) .
 	cp README.md LICENSE dist/$(WINDOWS_AMD64_DIR)/
-	cd dist && zip -r -9 $(WINDOWS_AMD64_DIR).zip $(WINDOWS_AMD64_DIR)
+	cd dist && 7z a -bd -r $(WINDOWS_AMD64_DIR).zip $(WINDOWS_AMD64_DIR)
 
-	
+# Build for WEB
+.PHONY: build-wasm
+build-wasm:
+	mkdir -p dist/$(WASM_DIR)
+	env GOOS=js GOARCH=wasm $(GO) build -ldflags $(LDFLAGS) -o dist/$(WASM_DIR)/$(WASM_BINARY) .
+	cp README.md LICENSE assets/index.html dist/$(WASM_DIR)/
+	cp $(GOROOT)/lib/wasm/wasm_exec.js dist/$(WASM_DIR)/
+	cd dist && tar czf $(WASM_DIR).tar.gz $(WASM_DIR)
 
-# Show version
+# Print version
 .PHONY: version
 version:
 	@echo $(VERSION)
@@ -79,6 +87,7 @@ PHONY: clean
 clean:
 	# go clean ;
 	rm -rf dist
+	rm -f *.syso
 
 PHONY: run-debug
 run-debug:
@@ -87,3 +96,8 @@ run-debug:
 PHONY: run
 run:
 	go run . ;
+
+PHONY: run-web
+run-web:
+	go run github.com/hajimehoshi/wasmserve@latest .
+	open http://localhost:8080
