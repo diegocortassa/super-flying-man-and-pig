@@ -2,10 +2,11 @@ package main
 
 import (
 	_ "embed"
-	"image/color"
+	"fmt"
 
 	"github.com/diegocortassa/super-flying-man-and-pig/assets"
 	"github.com/diegocortassa/super-flying-man-and-pig/globals"
+	"github.com/diegocortassa/super-flying-man-and-pig/version"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -29,9 +30,12 @@ func (g *Game) DrawCreditsState(screen *ebiten.Image) {
 	line += 15
 	DrawTextByCenter(screen, "JUHANI JUNKALA", assets.ArcadeFont, globals.ScreenWidth/2, globals.ScreenHeight/6+line, assets.ColorYellow)
 	line += 30
-	DrawTextByCenter(screen, "TITLE IMAGE", assets.ArcadeFont, globals.ScreenWidth/2, globals.ScreenHeight/6+line, color.White)
+	DrawTextByCenter(screen, "TITLE IMAGE", assets.ArcadeFont, globals.ScreenWidth/2, globals.ScreenHeight/6+line, assets.ColorWhite)
 	line += 15
 	DrawTextByCenter(screen, "ANDREA PENNAZIO", assets.ArcadeFont, globals.ScreenWidth/2, globals.ScreenHeight/6+line, assets.ColorYellow)
 	//
-	DrawTextByCenter(screen, "PRESS FIRE TO PLAY", assets.ArcadeFont, globals.ScreenWidth/2, globals.ScreenHeight/3*2+20, assets.ColorWhite)
+	DrawTextByCenter(screen, "PRESS FIRE TO PLAY", assets.ArcadeFont, globals.ScreenWidth/2, globals.ScreenHeight/3*2+20, assets.ColorYellow)
+
+	DrawTextByCenter(screen, fmt.Sprintf("VERSION: %s", version.Version), assets.ArcadeFont, globals.ScreenWidth/2, globals.ScreenHeight/8*7, assets.ColorWhite)
+
 }
