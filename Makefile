@@ -42,7 +42,7 @@ build-windows:
 	mkdir -p dist/$(WINDOWS_AMD64_DIR)
 	GOOS=windows GOARCH=amd64 $(GO) build -ldflags $(LDFLAGS) -o dist/$(WINDOWS_AMD64_DIR)/$(WINDOWS_AMD64_BINARY) .
 	cp README.md LICENSE dist/$(WINDOWS_AMD64_DIR)/
-	cd dist && 7z a -bd -r $(WINDOWS_AMD64_DIR).zip $(WINDOWS_AMD64_DIR)
+	cd dist && zip -r $(WINDOWS_AMD64_DIR).zip $(WINDOWS_AMD64_DIR)
 
 # Build for WEB
 .PHONY: build-wasm

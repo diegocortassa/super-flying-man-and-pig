@@ -1,0 +1,78 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Get version from tag
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+
+      - name: Install Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+
+      - name: Install Ebitengine build dependencies
+        run: >-
+          sudo apt-get update &&
+          sudo apt-get -y install
+          libc6-dev
+          libgl1-mesa-dev
+          libxcursor-dev
+          libxi-dev
+          libxinerama-dev
+          libxrandr-dev
+          libxxf86vm-dev
+          libasound2-dev
+          pkg-config
+
+      - name: Install support for windows resources
+        run: go install github.com/tc-hib/go-winres@latest
+
+      - name: Downloads go modules dependencies
+        run: go mod tidy
+
+      - name: Build binaries
+        run: |
+          make build-linux
+          make build-windows
+          make build-wasm
+
+      - name: Generate checksums
+        run: |
+          cd dist
+          sha256sum *.tar.gz *.zip > checksums.txt
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            dist/*.tar.gz
+            dist/*.zip
+            dist/checksums.txt
+          name: SuperFlyingManAndPig ${{ env.VERSION }}
+          body: |
+            ## Super Flying Man And Pig ${{ env.VERSION }}
+
+            ### Packages
+            - Linux binary
+            - Windows binary
+            - Wasm binary for web browsers
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
