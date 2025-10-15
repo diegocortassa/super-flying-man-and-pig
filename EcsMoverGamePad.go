@@ -109,9 +109,13 @@ func (gp *MoverGamePad) Draw(screen *ebiten.Image) {
 
 func (gp *MoverGamePad) shoot() {
 	if bul, ok := BullettFromPool(gp.bulletsPool); ok {
-		bul.Active = true
+		// Play fire sound
+		sp := gp.container.GetComponent(&SoundPlayer{}).(*SoundPlayer)
+		sp.PlaySound(SoundFire)
+		// shoot
 		bul.Position.X = gp.container.Position.X
 		bul.Position.Y = gp.container.Position.Y
+		bul.Active = true
 		// bul.rotation = 270 * (math.Pi / 180)
 		gp.lastShot = time.Now()
 	}
